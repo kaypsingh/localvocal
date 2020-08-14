@@ -1,0 +1,196 @@
+
+
+.feedBox{width:100%; background: #ffffff;
+    box-shadow: 0px 0px 12px rgba(116, 98, 171, 0.05);
+    border-radius: 6px;
+    max-width:580px;
+    margin-left:auto; margin-right:auto;
+    position:relative;
+    top:20px;
+  }
+div.feedBox, .feedBox div{box-sizing:border-box;}
+.feedBox p{margin:0px; padding:0px;}
+.feedHeader{background:#725da2; color:#ffffff; text-align: center; font-size:20px; padding-top:15px; padding-bottom:15px;}
+.feedHeader h4{font-size:28px; margin:0px auto 0px auto; display:block;}
+.feedRatingBox{width:100%; display:table; padding:20px 0px;}
+.feedRatingBox .feedBoxLf{display:table-cell; width:50%;  text-align:center;}
+.feedRatingBox .feedBoxLf.borderRt{border-right:2px solid #f4f4f6;}
+.feedRatingBox .feedBoxLf h5{color:#000000; font-size:25px; font-weight:bold; margin-top:10px; margin-bottom:10px;}
+.feedRatingBox .feedBoxLf a.starRating{display:inline-block;}
+.feedRatingBox .feedBoxLf a img{width:30px;}
+.feedTextArea{width:100%; color:#777777; background:#f4f3f8; padding:15px; text-align: left;}
+.feedTextArea textarea{width:100%; min-height:80px; color:#98979c; font-size:18px; font-weight:normal; border:none; background:transparent; outline:none; resize:none; padding:0px;}
+.feedTextArea textarea:focus{outline:none; box-shadow:none;}
+.feedQuality{text-align:left; width:100%; padding:20px 15px;}
+.feedQuality h6{font-weight:normal; font-size:22px; margin:0px;}
+.feedQuality p{margin-top:15px; margin-bottom:0px; padding:0px;}
+.feedFooter{display:table; width:100%; background:#725da2; color:#ffffff; margin-bottom:20px;}
+.feedFooter input[type="submit"]{width:50%; display:table-cell; height:65px; border:none; color:#ffffff; font-weight:bold; font-size:22px; line-height:55px; background:#725da2;}
+.feedFooter input[type="submit"]:first-child{border-right:2px solid #ffffff;}
+
+.feedRatingBox .feedBoxLf .feedIconImg{width:40px;}
+.feedRatingBox .feedBoxLf.borderRt .feedIconImg{width:47px;}
+.feedFooter input:hover{background:#4a3280;}
+
+/*Custom Radio*/
+.feedQuality [type="radio"]:checked,
+.feedQuality [type="radio"]:not(:checked) {
+    position: absolute;
+    left: -9999px;
+}
+.feedQuality [type="radio"]:checked + label,
+.feedQuality [type="radio"]:not(:checked) + label
+{
+    position: relative;
+    padding-left: 28px;
+    cursor: pointer;
+    line-height: 20px;
+    display: inline-block;
+    color: #666;
+    margin-right:25px;
+}
+.feedQuality [type="radio"]:checked + label:before,
+.feedQuality [type="radio"]:not(:checked) + label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #767676;
+    border-radius: 100%;
+    background: #fff;
+}
+.feedQuality [type="radio"]:checked + label:after,
+.feedQuality [type="radio"]:not(:checked) + label:after {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: #725da2;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    border-radius: 100%;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+.feedQuality [type="radio"]:checked + label:before
+ {
+    border-color:#725da2;
+}
+.feedQuality [type="radio"]:not(:checked) + label:after {
+    opacity: 0;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+}
+.feedQuality [type="radio"]:checked + label:after {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+}
+
+.videoMeetBox{width:100%; background: #ffffff;
+    box-shadow: 0px 0px 12px rgba(116, 98, 171, 0.05);
+    border-radius: 6px;
+    max-width:250px;
+    margin-left:auto; margin-right:auto;
+    position:absolute;
+    top:40px;
+    font-family:arial; 
+    font-size:18px;
+    color:#000000;
+    overflow:hidden;
+    right:20px;  
+    top:120px;  
+    z-index:99999;
+  }
+.dialogHeader{box-shadow:0px 0px 8px rgba(0, 0, 0, 0.20); padding:12px 20px 8px; position:relative; z-index:99999; background:#ffffff; border-radius:6px 6px 0px 0px;}
+.dialogHeader a{display:inline-block; margin-right:15px;}
+.dialogHeader a img{height:30px!important; width:auto;}
+.dialogBody{padding:10px 10px; box-sizing:border-box;  / overflow-y:auto; /     width: 100%;
+    / min-height: 330px; /
+    text-align: left;
+    border: none;
+    font-size: 18px;
+    font-family: arial; resize:none; 
+    height:330px;
+}
+.dialogBody:focus{border:none; outline:none;}
+#dialogProgress{position:absolute; bottom:0px; height:3px; right:0px;display:block; left:0px; background:red;}
+.proActive{display:block;}
+#speech{padding:10px;}
+/*
+ *  speech
+ */
+
+#speech::-webkit-scrollbar-track
+{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #F5F5F5;
+}
+
+#speech::-webkit-scrollbar
+{
+    width: 6px;
+    background-color: #F5F5F5;
+}
+
+#speech::-webkit-scrollbar-thumb
+{
+    background-color: #000000;
+}
+
+#webinarHelpBox{width:100%; background: #ffffff;
+    box-shadow: 0px 0px 12px rgba(116, 98, 171, 0.05);
+    border-radius: 6px;
+    max-width:450px;
+    margin-left:auto; margin-right:auto;
+    position:absolute;
+    top:40px;
+    font-family:arial; 
+    font-size:17px;
+    color:#000000;
+    overflow:hidden;     
+    top:120px; 
+    left:50%;
+    transform:translateX(-50%); 
+    z-index:99999;
+  }
+
+.dialogHeader {
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.20);
+    padding: 12px 20px 8px;
+    position: relative;
+}
+#webinarHelpBox h4, #webinarHelpBox h5, #webinarHelpBox h3{margin:0px; padding:5px 0px;}
+#webinarHelpBox h4{font-size:22px;}
+#webinarHelpBox h5{font-size:17px;}
+#webinarHelpBox h3{font-size:20px; margin-top:10px; margin-bottom:10px;}
+.videoHelpBody{padding:15px 20px 20px; }
+.videoHelpBody ul, .videoHelpBody ul li{ margin:0px 20px; padding:0px;}
+.videoHelpBody ul li{margin-top:10px;}
+.videoHelpClose{position:absolute; right:15px; top:16px;}
+.videoHelpClose img{width:30px; height:auto; opacity:0.75;}
+
+
+#conferenceHelpBox{width:100%; background: #ffffff;
+    box-shadow: 0px 0px 12px rgba(116, 98, 171, 0.05);
+    border-radius: 6px;
+    max-width:450px;
+    margin-left:auto; margin-right:auto;
+    position:absolute;
+    top:40px;
+    font-family:arial; 
+    font-size:17px;
+    color:#000000;
+    overflow:hidden;     
+    top:120px; 
+    left:50%;
+    transform:translateX(-50%); 
+    z-index:99999;
+  }
+#conferenceHelpBox h4, #conferenceHelpBox h5, #conferenceHelpBox h3{margin:0px; padding:5px 0px;}
+#conferenceHelpBox h4{font-size:22px;}
+#conferenceHelpBox h5{font-size:17px;}
+#conferenceHelpBox h3{font-size:20px; margin-top:10px; margin-bottom:10px;}
