@@ -1,0 +1,155 @@
+.popBoxBody .textBox {
+    border: 1px solid #cfe0eb;
+    height: 42px;
+    line-height: 42px;
+    font-size: 14px;
+    font-weight: normal;
+    width: 100%;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    box-sizing: border-box;
+}
+input[type=text], input[type=password], textarea {
+    outline: 0;
+    resize: none;
+}
+button, input, select, textarea {
+    margin: 0;
+    vertical-align: baseline;
+    font-size: 1em;
+}
+
+.popBoxInner {
+    width: 450px;
+    max-width: calc(100% - 40px);
+    background: #ffffff;
+    border-radius: 12px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 30px 30px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+}
+
+.popBoxBody {
+    box-sizing: border-box;
+}
+
+.popBoxInner .popBoxFooter {
+    border-top: 1px solid #cfe0eb!important;
+}
+
+.popBoxFooter {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 15px;
+    padding-top: 20px;
+    /* border-top: 1px solid #cfe0eb; */
+}
+
+ .loginButton {
+    width: auto;
+    height: 40px;
+    line-height: 15px;
+    background: #bf2117;
+    border-color: #bf2117;
+    color: #fff;
+    font-weight: 400;
+    border: 1px solid transparent;
+    padding: .5rem 1rem;
+    font-size: 1rem;
+    border-radius: .25rem;
+    cursor: pointer;
+    box-sizing: border-box;
+    margin-right: 10px;
+    display: inline;
+}
+
+.cancelButton {
+    width: auto;
+    height: 40px;
+    line-height: 15px;
+    background: #35363a;
+    border-color: #35363a;
+    color: #fff;
+    font-weight: 400;
+    border: 1px solid transparent;
+    padding: .5rem 1rem;
+    font-size: 1rem;
+    border-radius: .25rem;
+    cursor: pointer;
+    box-sizing: border-box;
+    margin-right: 10px;
+    display: inline;
+}
+button {
+    color: #FFF;
+    background-color: #44A5FF;
+    border-radius: 4px;
+}
+
+.popBox button.cancelButton {
+    background: #35363a;
+}
+
+.hello {
+    background: #3572b0 no-repeat right center;
+    color: #ffffff;
+    padding: 4px 28px 4px 7px;
+    border-radius: 5px;
+    font-size: 16px;
+    /* font-weight: normal; */
+    text-decoration: none;
+}
+
+.tableBox th {
+    background: #e6f3fb;
+    font-weight: bold;
+    border-bottom: 1px solid #cfe0eb;
+    border-left: 1px solid #cfe0eb;
+    padding: 10px 15px;
+    font-size: 14px;
+    text-align: left;
+    color: #333333 !important;
+}
+
+.popBox {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.4);
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px;
+    color: #333333;
+    z-index: 9;
+
+}
+
+#dvListScheduleMeeting .popBoxInner {
+    width: 800px;
+}
+
+.tableBox td {
+    border-bottom: 1px solid #cfe0eb;
+    border-left: 1px solid #cfe0eb;
+    padding: 10px 15px;
+    font-size: 13px;
+    text-align: left;
+    color: #333333 !important;
+}
+
+.tableBox {
+    border: 1px solid #cfe0eb;
+    padding: 0px;
+    margin: 0px;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+
+

@@ -1,0 +1,143 @@
+import React from 'react';
+import qs from 'qs'
+import axios from 'axios';
+import './LoginMeeting.css'
+import ScheduleMeetinglist from './ScheduleMeetinglist';
+
+
+class LoginMeeting extends React.Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      scheduleList: 0,
+    
+      password: '',
+      login: 0
+    }
+  }
+
+ 
+
+  handlePwdChange = (event) => {
+    this.setState({ password: event.target.value });
+  }
+
+
+
+
+  handleLogin = () => {
+
+    if (this.props.username === '' && this.state.password === '') { alert('enter username and password') }
+
+    else if(this.props.username === '' && this.state.password !== '') {alert('enter username')}
+
+    else if(this.props.username !== '' && this.state.password === '') {alert('enter password')}
+
+    else {
+
+      axios.post('https://api.videomeet.in/v2/authentication.php/', qs.stringify({
+
+        authkey: 'M2atKiuCGKOo9Mj3',
+        username: this.props.username,
+        password: this.state.password,
+
+      }), {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        "Access-Control-Allow-Origin": "*",
+      }
+
+      )
+        .then((response) => {
+          console.log(response)
+        
+          if (response.request.readyState === 4 && response.request.status === 200) {
+
+            if (response.data.status === 1) {
+
+           var name = response.data.data.name
+
+              this.setState({ login: 1 }, () => {this.props.getName(name)})
+
+
+            }
+
+            else if (response.data.status === 0) {
+
+              alert('Please check Username and Password')
+
+            }
+          }
+        },
+          (error) => {
+            console.log(error)
+          }
+        )
+
+
+    }
+
+  }
+
+
+  LoginMeetinglist = () => {
+    this.setState({ scheduleList: 1 })
+  }
+
+
+
+  render() {
+
+  
+    return (
+
+
+      this.state.login === 0 ?
+        <>
+
+          <div className="popBoxInner">
+
+            <div className="popBoxBody">
+              <label>
+                <span>VIDEOMEET Username</span>
+              </label>
+              <input type="text" className="textBox" id="txtUserName" placeholder="username"
+                onChange={this.props.handleUnameChange}
+              />
+
+              <label>
+                <span>Password</span>
+
+              </label>
+              <input type="password" className="textBox" id="txtPassword" placeholder="password"
+                onChange={this.handlePwdChange}
+              />
+            </div>
+
+            <div className="popBoxFooter">
+
+              <button className="cancelButton" onClick={this.props.cancelBtn} >Cancel</button>
+              <button className="loginButton" onClick={this.handleLogin} >Login</button>
+            </div>
+          </div>
+
+        </>
+
+        :
+
+       <ScheduleMeetinglist
+       bc = {this.props.name}
+       uname = {this.props.username}
+
+       >
+
+       </ScheduleMeetinglist>
+
+
+    )
+  }
+
+}
+
+export default LoginMeeting;
+

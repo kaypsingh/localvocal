@@ -1,38 +1,48 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+#enter_room {
+  display: block;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  max-width: calc(100% - 40px);
+  /* width: 680px; */
+  width: 380px;
+  z-index: 2;
+  background-color: #fff;
+  padding: 25px 30px;
+  border-radius: 20px;
 }
 
-.App-link {
-  color: #61dafb;
+#enter_room .enter-room-input-container {
+  width: 100%;
+  padding: 0 8px 5px 0;
+  text-align: left;
+  color: #253858;
+  height: fit-content;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+#enter_room .enter-room-input-container .enter-room-title {
+  display: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  padding-bottom: 5px;
+}
+
+#enter_room .helper-link {
+  position: absolute;
+  top: 29px;
+  right: 31px;
+  font-size: 14px;
+}
+
+#enter_room .enter-room-input-container .enter-room-input {
+  border: none;
+  display: inline-block;
+  width: 100%;
+  font-size: 14px;
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  padding: 5px 10px;
+  margin-right: 0px;
+  border-radius: 5px;
+  margin-top: 10px;
+  height: 35px;
+  box-sizing: border-box;
 }

@@ -1633,16 +1633,16 @@ fieldset, img {
 	border: 0
 }
 
-@
+/* @
 -moz-document url-prefix (){
 	img {font-size: 0
-}
+} */
 
 img:-moz-broken {
 	font-size: inherit
 }
 
-}
+
 details, main, summary {
 	display: block
 }
@@ -1652,10 +1652,10 @@ audio, canvas, progress, video {
 	vertical-align: baseline
 }
 
-audio:not ([controls] ){
+/* audio:not ([controls] ){
 	display: none;
 	height: 0
-}
+} */
 
 [hidden], template {
 	display: none
@@ -2451,9 +2451,9 @@ button.no-icon {
 	border: none
 }
 
-.dialog .aui-dialog2-header, .dialog .form-control:not (:last-child ){
+/* .dialog .aui-dialog2-header, .dialog .form-control:not (:last-child ){
 	border-bottom: 1px solid #253858
-}
+} */
 
 .dialog .aui-dialog2-header {
 	border-radius: 5px 5px 0 0;
@@ -2571,7 +2571,7 @@ button.no-icon {
 	margin: 16px auto 0
 }
 
-@
+/* @
 -webkit-keyframes shake-rotate { 0%{
 	-webkit-transform: scale(1) rotate(0);
 	transform: scale(1) rotate(0)
@@ -2628,7 +2628,7 @@ to {
 	transform: scale(1) rotate(3deg)
 }
 
-}
+} */
 .shake-rotate {
 	display: inline-block;
 	-webkit-animation-duration: .4s;
@@ -6041,7 +6041,7 @@ input[type=range]::-ms-thumb {
 .horizontal-filmstrip .filmstrip .videocontainer {
 	margin-bottom: 10px
 }
-
+/* 
 @
 -moz-document url-prefix (){ .horizontal-filmstrip #remoteVideos
 	#filmstripRemoteVideos #filmstripRemoteVideosContainer{flex-direction:row
@@ -6055,7 +6055,7 @@ supports (-ms-ime-align:auto ){ .horizontal-filmstrip #remoteVideos
 	
 }
 
-}
+} */
 .filmstrip__videos .videocontainer {
 	display: inline-block;
 	position: relative;
@@ -6079,7 +6079,7 @@ supports (-ms-ime-align:auto ){ .horizontal-filmstrip #remoteVideos
 	display: none
 }
 
-.filmstrip__videos .videocontainer:hover:not (.videoContainerFocused ):not
+/* .filmstrip__videos .videocontainer:hover:not (.videoContainerFocused ):not
 	(.active-speaker ){
 	cursor: hand;
 	border: 2px solid rgba(22, 94, 204, .4);
@@ -6090,7 +6090,7 @@ supports (-ms-ime-align:auto ){ .horizontal-filmstrip #remoteVideos
 .filmstrip__videos .videocontainer:hover:not (.videoContainerFocused ):not
 	(.active-speaker ) .remotevideomenu>.icon-menu {
 	display: inline-block
-}
+} */
 
 .filmstrip__videos .videocontainer>video {
 	cursor: hand;
@@ -6120,11 +6120,11 @@ supports (-ms-ime-align:auto ){ .horizontal-filmstrip #remoteVideos
 	overflow-y: auto
 }
 
-.tile-view .filmstrip__videos .videocontainer:hover:not (.active-speaker
+/* .tile-view .filmstrip__videos .videocontainer:hover:not (.active-speaker
 	), .tile-view .filmstrip__videos .videocontainer:not (.active-speaker ){
 	border: none;
 	box-shadow: none
-}
+} */
 
 .tile-view #remoteVideos {
 	height: 100% !important;
@@ -6335,7 +6335,7 @@ supports (-ms-ime-align:auto ){ .horizontal-filmstrip #remoteVideos
 	{
 	bottom: 0
 }
-
+/* 
 @
 -moz-document url-prefix (){ .vertical-filmstrip #remoteVideos
 	#filmstripRemoteVideos #filmstripRemoteVideosContainer{flex-direction:column;
@@ -6349,7 +6349,7 @@ supports (-ms-ime-align:auto ){ .vertical-filmstrip #remoteVideos
 	
 }
 
-}
+} */
 .vertical-filmstrip .filmstrip__toolbar {
 	transform: rotate(-90deg)
 }

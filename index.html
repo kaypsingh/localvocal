@@ -401,7 +401,7 @@
         	var roomname = (document.getElementById("txtRoomName").value).trim().toLowerCase();
         	var meetingDate = (document.getElementById("txtMeetingDate").value).trim();
         	var meetingTime = (document.getElementById("txtMeetingTime").value).trim();
-        	//var meetingMode = document.getElementById("inpRadConference").value;
+        
         	var meetingMode = document.querySelector('input[name="meeting_mode"]:checked').value;
         	var roomPassword = (document.getElementById("txtRoomPassword").value).trim();
         	
@@ -1818,7 +1818,7 @@
 							//alert("Panelist added successfully !");
 							resetAddPenalist();
 							
-							var jsonPenalist = {
+					 		var jsonPenalist = {
 								"name" : penalistName,
 								"email" : penalistEmailAddress,
 								"code" : txtPenalistCode,
