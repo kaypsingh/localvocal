@@ -11,7 +11,7 @@ class LoginMeeting extends React.Component {
     super(props)
     this.state = {
       scheduleList: 0,
-    
+      loginCredentials: [],
       password: '',
       login: 0
     }
@@ -50,6 +50,16 @@ class LoginMeeting extends React.Component {
       )
         .then((response) => {
           console.log(response)
+
+          const loginCredentials = localStorage.getItem('added-credentials')
+          console.log(loginCredentials.length)
+
+          const parsedrest = []
+          parsedrest.push({ username: this.props.username, password: this.state.password })
+
+
+          localStorage.setItem('added-credentials', JSON.stringify(parsedrest));
+          console.log(loginCredentials)
         
           if (response.request.readyState === 4 && response.request.status === 200) {
 
@@ -57,7 +67,13 @@ class LoginMeeting extends React.Component {
 
            var name = response.data.data.name
 
-              this.setState({ login: 1 }, () => {this.props.getName(name)})
+           if(loginCredentials.length !== 0) {
+
+              this.setState({ login: 1  }, () => {this.props.getName(name)})
+
+           }else{
+             
+           }
 
 
             }
@@ -128,6 +144,10 @@ class LoginMeeting extends React.Component {
        <ScheduleMeetinglist
        bc = {this.props.name}
        uname = {this.props.username}
+       scheduleApi = {this.props.scheduleApi}
+      //  scheduleApi={this.scheduleApi}
+       dataSource={this.props.dataSource}
+       parentData={this.props.parentData}
 
        >
 

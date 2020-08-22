@@ -9,9 +9,9 @@ class ScheduleMeetinglist extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      dataEntry: '',
-      dataSource: [],
-      parentData: {},
+
+
+
       createPopup: 0,
       meetingTitle: '',
       meetingDate: new Date(),
@@ -23,9 +23,42 @@ class ScheduleMeetinglist extends React.Component {
       emptyValue: 0,
       waitingRoom: false,
       confId: '',
-      panelistDialog: 0
+      panelistDialog: 0,
+      sharePopup: 0,
 
+      shareRoomName: '',
+      sharePassword: '',
+      shareTopic: '',
+      // redirectPanelistDialogue: 0
+      shareTime: '',
+      hidePanelistPopup: 1,
+      hideDeletePopup: 1
     }
+  }
+
+
+  sharePopupClose = () => {
+    this.setState({ sharePopup: 0 })
+  }
+
+  deletePopupClose = () => {
+    this.setState({ hideDeletePopup: 1 })
+  }
+
+  handlePanelistPopup = () => {
+    console.log('ji')
+    this.setState({ hidePanelistPopup: 0 })
+  }
+
+  handleDeletePopup = () => {
+    this.setState({ hideDeletePopup: 0 })
+  }
+
+  handleSharePopup = (r) => {
+    console.log(r)
+    console.log(r.roomname)
+
+    this.setState({ sharePopup: 1, shareRoomName: r.roomname, shareTopic: r.topic, sharePassword: r.room_pass, shareTime: r.conferencescheduletime })
   }
 
   handleMeetingTitle = (event) => {
@@ -98,14 +131,14 @@ class ScheduleMeetinglist extends React.Component {
   }
 
   newMeetingClose = () => {
-    this.setState({ createPopup: 0 }, this.scheduleApi)
+    this.setState({ createPopup: 0 }, this.props.scheduleApi)
   }
 
   saveBtn = () => {
 
-   
+
     var a = this.state.meetingDate
-   
+
 
     var expDate = new Date(this.state.meetingDate.split("-")[2] + "," + this.state.meetingDate.split("-")[1] + "," + this.state.meetingDate.split("-")[0]);
     var expDate = new Date(expDate.getTime() + (7 * 24 * 60 * 60 * 1000));
@@ -149,16 +182,19 @@ class ScheduleMeetinglist extends React.Component {
         console.log(response)
         alert(response.data.msg)
 
-        this.setState({confId: response.data.data.confrenceid } , () => {
-          if(response.data.msg === "conference scheduled successfully"){
+        this.setState({ confId: response.data.data.confrenceid }, () => {
+
+          console.log(this.state.confId)
+          if (response.data.msg === "conference scheduled successfully") {
+
 
             console.log('kooo')
             //do something here
-           this.setState({panelistDialog: 1})
+            this.setState({ panelistDialog: 1 })
           }
         })
 
-     
+
 
 
       },
@@ -179,56 +215,20 @@ class ScheduleMeetinglist extends React.Component {
     });
   }
 
-
-  scheduleApi = () => {
-
-    axios.post('https://api.videomeet.in/v2/conference.php/confrencelist', qs.stringify({
-
-      authkey: 'M2atKiuCGKOo9Mj3',
-      username: this.props.uname
-
-
-    }), {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      "Access-Control-Allow-Origin": "*",
-    }
-
-    )
-      .then((response) => {
-        console.log(response)
-        console.log(response.data.msg)
-
-        if (response.data.msg === "No record found") {
-          this.setState({ dataEntry: 'No record found' })
-        }
-
-        else if (response.data.msg === "conference list fetched successfully") {
-          var res = response.data.data
-          this.setState({ dataSource: res, parentData: response.data.msg })
-
-        }
-
-      },
-        (error) => {
-          console.log(error)
-        }
-      )
-
-
-
-  }
-
   componentDidMount() {
-    this.scheduleApi()
+    this.props.scheduleApi()
   }
 
   render() {
-    var logoutImg = 'https://bridge01.videomeet.in/images/logout-username.png'
+    var logoutImg = 'https://bridge01.videomeet.in/images/logout-username.png';
+    var copyIcon = "https://bridge01.videomeet.in/images/copy.jpg";
 
     return (
       <>
 
-        <div id="dvListScheduleMeeting" className="popBox" style={{ display: this.state.createPopup === 0 ? '' : 'none' }}>
+      {/* schedule meeting list */}
+
+        <div id="dvListScheduleMeeting" className="popBox" style={{ display: this.state.createPopup === 0 || this.props.scheduleListDisplay === 1 ? '' : 'none' }}>
 
           <div className="popBoxInner">
             <div className="popBoxHeader" id="dvScheduleMeetingTitle">
@@ -277,13 +277,19 @@ class ScheduleMeetinglist extends React.Component {
 
                   {
 
-                    this.state.parentData === "conference list fetched successfully" ?
+                    this.props.parentData === "conference list fetched successfully" ?
 
-                      this.state.dataSource.map((res, k) => {
+                      this.props.dataSource.map((res, k) => {
                         var j = Object.values(res)
+
 
                         var lock = "https://bridge01.videomeet.in/images/lock.png"
                         var videoIcon = "https://bridge01.videomeet.in/images/cameraIconBlue.png"
+                        var panelistIcon = "https://bridge01.videomeet.in/images/room_panelist.png"
+                        var roomIcon = "https://bridge01.videomeet.in/images/room.png"
+                        var deleteIcon = "https://bridge01.videomeet.in/images/delete-room.png"
+                        var shareIcon = "https://bridge01.videomeet.in/images/share_room.png"
+                        var editIcon = "https://bridge01.videomeet.in/images/edit-room.png"
 
                         return (
                           <>
@@ -299,8 +305,35 @@ class ScheduleMeetinglist extends React.Component {
                               </td>
                               <td>{res['conferencescheduletime']}</td>
 
-                              <td style={{ textAlign: 'center' }}></td>
-                              <td style={{ textAlign: 'center' }}></td>
+                              <td style={{ textAlign: 'center' }}>
+
+                                <img src={panelistIcon} onClick={this.handlePanelistPopup} className="image-size-set" alt title="Panelist" />
+
+
+                                <span className="spn-pipe-position">{"  "}</span>
+
+                                <img src={roomIcon} className="image-size-set" alt title="Room" />
+
+
+                              </td>
+                              <td style={{ textAlign: 'center' }}>
+
+
+                                <img src={deleteIcon} onClick={this.handleDeletePopup} className="image-size-set" alt title="Delete" />
+
+
+                                <span className="spn-pipe-position">{"   "}</span>
+
+
+                                <img src={shareIcon} onClick={() => { this.handleSharePopup(res) }} className="image-size-set" alt title="Share" />
+
+                                <span className="spn-pipe-position">{"   "}</span>
+
+
+                                <img src={editIcon} className="image-size-set" alt title="Edit" />
+
+
+                              </td>
                             </tr>
                           </>
                         )
@@ -340,14 +373,16 @@ class ScheduleMeetinglist extends React.Component {
 
         </div>
 
+      {/* create meeting popup */}
 
-        <div id="dvCreateNewMeeting" className="popBox" 
-        
-        style={{ display: this.state.createPopup === 1 && this.state.panelistDialog === 0 ? 'block' :
-        this.state.createPopup === 1 && this.state.panelistDialog === 1 ? 'none': 'none'
+        <div id="dvCreateNewMeeting" className="popBox"
 
-        
-       }}>
+          style={{
+            display: this.state.createPopup === 1  ? 'block' : 'none'
+          
+
+
+          }}>
           <div className="popBoxInner">
             <div className="popBoxHeader" id="dvSetTitle">
               <h5>
@@ -499,7 +534,7 @@ class ScheduleMeetinglist extends React.Component {
             <div className="popBoxFooter">
               <button className="cancelButton" onClick={this.newMeetingClose}>Close</button>
 
-              <button id="butSave" disabled style={{ display: 'inline-block' }}>
+              <button id="butSave" style={{ display: 'inline-block' }}>
                 <span onClick={this.saveBtn}>Save</span>
               </button>
 
@@ -511,14 +546,153 @@ class ScheduleMeetinglist extends React.Component {
           </div>
 
         </div>
-     
-     
+
+
+
+        <div id="dvShareScheduleDetail" className="popBox" style={{ display: this.state.sharePopup === 1 ? 'block' : 'none' }}>
+          <div className="popBoxInner">
+            <div className="popBoxHeader">
+              <h5>
+                <span>Copy and Share to Invite</span>
+              </h5>
+            </div>
+
+            <div className="popBoxBody" id="dvShareDetailBody">
+              <h5>
+                <span>
+                  <strong> {this.props.bc}  is inviting you to a scheduled VideoMeet.</strong>
+                </span>
+              </h5>
+
+
+              <h6>
+                <u><span>Topic</span>{": "}{this.state.shareTopic}</u>
+              </h6>
+
+              <p>
+                <strong>
+                  <span>Time</span>{": "}{this.state.shareTime}
+                </strong>
+
+                <br>
+                </br>
+
+                <strong>
+                  <span>Host</span>{": "}{this.props.bc}
+                </strong>
+              </p>
+
+
+              <h6>
+                <u>
+                  <span>Joining Details</span>
+                </u>
+              </h6>
+
+              <p>
+                <strong>Meeting Room Name</strong>{": "}{this.state.shareRoomName}
+                <br></br>
+
+                <strong>Meeting Room Password</strong>{this.state.sharePassword}
+
+
+              </p>
+
+
+              <h6>
+                <u>
+                  <span>Join VideoMeet</span>
+                </u>
+
+              </h6>
+
+              <a href="https://bridge01.videomeet.in/" className="upMove" target="_blank">https:/bridge01.videomeet.in</a>
+
+              <img src={copyIcon} title="Click to copy" style={{ right: -545, position: "relative", top: 73, cursor: 'pointer' }} />
+
+            </div>
+
+            <div className="popBoxFooter">
+              <button className="cancelButton" onClick={this.sharePopupClose} >
+                <span>Close</span>
+              </button>
+
+              <span id="spnSendMailToShare">
+
+                <button className="btnMail">
+                  <span>  Send Mail With Password</span>
+                </button>
+
+                <button className="btnMail">
+                  <span>  Send Mail Without Password</span>
+                </button>
+
+                <button className="btnMail">
+                  <span>  Send Password</span>
+                </button>
+
+
+
+              </span>
+
+            </div>
+          </div>
+
+        </div>
+
+        <div id="dvDeleteMessage" className="popBox" style={{ display: this.state.hideDeletePopup === 0 ? 'block' : 'none' }}>
+          <div className="popBoxInner">
+            <div className="popBoxHeader" id="dvDeleteMessageTitle">
+              <h5>
+                <span>Confirm Delete</span>
+              </h5>
+            </div>
+
+            <div className="popBoxBody relativeDiv">
+              <span className="relativeDivBlock" id="spnDeleteMessageBody">
+                <span>
+                  <h6>Following will be deleted from the Room - {this.props.uname}.</h6>
+          1. Document
+          <br></br>
+          2. Recording
+          <br></br>
+          3. Participant / Panelist
+          <br></br>
+          4. Chat
+          <br></br>
+          5. History
+
+        </span>
+              </span>
+
+            </div>
+
+            <div className="popBoxFooter">
+              <button className="cancelButton" onClick={this.deletePopupClose} >
+                <span>Close</span>
+              </button>
+
+              <span id="spnDeleteMessageBut"></span>
+              <button>
+                <span>Yes, Delete</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      {/* Add Panel popup */}
+
         {this.state.panelistDialog === 1 ?
           <Panelist
-          conferId= {this.state.confId}
-          ></Panelist>: ''
+
+            conferId={this.state.confId}
+            meetingRoomName={this.state.meetingRoomName}
+            scheduleApi={this.props.scheduleApi}
+
+          ></Panelist> : ''
         }
-     
+
       </>
     )
   }
