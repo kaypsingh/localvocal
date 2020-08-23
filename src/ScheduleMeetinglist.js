@@ -1,7 +1,6 @@
 import React from 'react';
 import qs from 'qs'
 import axios from 'axios';
-import DatePicker from 'react-date-picker';
 import Panelist from './Panelist'
 
 class ScheduleMeetinglist extends React.Component {
@@ -11,7 +10,7 @@ class ScheduleMeetinglist extends React.Component {
     this.state = {
 
 
-
+      editPopup: 0,
       createPopup: 0,
       meetingTitle: '',
       meetingDate: new Date(),
@@ -19,6 +18,14 @@ class ScheduleMeetinglist extends React.Component {
       meetingRoomName: '',
       meetingTime: '',
       selectedOption: 1,
+
+      editMeetingTitle: '',
+      editMeetingDate: '',
+      editMeetingPwd: '',
+      editMeetingTime: '',
+      editwaitingRoom: false,
+
+
       roomAvail: '',
       emptyValue: 0,
       waitingRoom: false,
@@ -29,10 +36,15 @@ class ScheduleMeetinglist extends React.Component {
       shareRoomName: '',
       sharePassword: '',
       shareTopic: '',
-      // redirectPanelistDialogue: 0
+
       shareTime: '',
       hidePanelistPopup: 1,
-      hideDeletePopup: 1
+      hideDeletePopup: 1,
+      deleteRoomName: '',
+      parentResponse: {},
+      editResponse: {},
+      dateFormat: ''
+
     }
   }
 
@@ -50,8 +62,10 @@ class ScheduleMeetinglist extends React.Component {
     this.setState({ hidePanelistPopup: 0 })
   }
 
-  handleDeletePopup = () => {
-    this.setState({ hideDeletePopup: 0 })
+  handleDeletePopup = (r) => {
+    console.log(r)
+    this.setState({ hideDeletePopup: 0, deleteRoomName: r.roomname, parentResponse: r })
+    console.log(r.roomname)
   }
 
   handleSharePopup = (r) => {
@@ -66,8 +80,19 @@ class ScheduleMeetinglist extends React.Component {
 
   }
 
+  editMeetingTitleFun = (event) => {
+
+    console.log(this.state.editResponse)
+    this.setState({editMeetingTitle: event.target.value})
+  }
+
   handleMeetingDate = (event) => {
+    console.log(event.target.value)
     this.setState({ meetingDate: event.target.value });
+  }
+
+  editMeetingDateFun = (event) => {
+  this.setState({editMeetingDate: event.target.value })
   }
 
   handleMeetingRoomName = (event) => {
@@ -115,8 +140,19 @@ class ScheduleMeetinglist extends React.Component {
     this.setState({ waitingRoom: !this.state.waitingRoom })
   }
 
+  editWaitingRoomFun = () => {
+
+    this.setState({ waitingRoom: !this.state.editwaitingRoom })
+  }
+
   handleMeetingTime = (event) => {
+    console.log(event.target.value)
     this.setState({ meetingTime: event.target.value });
+  }
+
+  editMeetingTimeFun = (event) => {
+    console.log(event.target.value)
+    this.setState({ editMeetingTime: event.target.value})
   }
 
   handlePwd = () => {
@@ -126,15 +162,189 @@ class ScheduleMeetinglist extends React.Component {
     this.setState({ meetingPwd: pwd })
   }
 
+
   newMeetingDialog = () => {
     this.setState({ createPopup: 1 })
+  }
+
+  editMeetingDialog = (r) => {
+    console.log(r)
+
+    var string = r.conferencescheduletime
+    console.log(string)
+    var result = string.substring(string.lastIndexOf(" ") + 1);
+    var str = result.substring(0, result.length - 3);
+    this.setState({ editPopup: 1, editResponse: r, editTime: str })
+
   }
 
   newMeetingClose = () => {
     this.setState({ createPopup: 0 }, this.props.scheduleApi)
   }
 
-  saveBtn = () => {
+  editDateFormat = () => {
+
+    // this.state.editPopup === 1 ?
+    var d = this.state.editResponse.conferencescheduletime.split(" ")[0];
+    d = d.split("-").reverse().join("-");
+    console.log(d)
+
+    if (this.state.editPopup === 1) {
+      return d
+    } else {
+      return this.state.dateFormat
+
+
+
+    }
+
+  }
+
+
+  deleteFunctionality = () => {
+
+    axios.post('https://api.videomeet.in/v2/conference.php/delete', qs.stringify({
+
+      authkey: 'M2atKiuCGKOo9Mj3',
+      confrenceid: this.state.parentResponse.confrenceid
+
+
+    }), {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      "Access-Control-Allow-Origin": "*",
+    }
+
+    )
+      .then((response) => {
+        console.log(response)
+        console.log(response.data.msg)
+        alert(response.data.msg)
+
+      },
+        (error) => {
+          console.log(error)
+        }
+      )
+
+
+  }
+
+
+  editFunctionality = () => {
+
+
+    // if date unchanged time changed----time not updating (data is going right)
+    console.log('updating')
+
+console.log(this.state.editMeetingTime)
+
+if(this.state.editMeetingTitle === "" ){
+  var t = this.state.editResponse.topic
+} else{
+  var t = this.state.editMeetingTitle
+}
+
+
+if(this.state.editMeetingDate == "" && this.state.editMeetingTime === ""){
+
+
+  var conferenceexpirationtime = this.state.editResponse.conferenceexpirationtime
+
+}else if(this.state.editMeetingDate !== "" && this.state.editMeetingTime !== ""){
+
+
+  var expDate = new Date(this.state.editMeetingDate.split("-")[2] + "," + this.state.editMeetingDate.split("-")[1] + "," + this.state.editMeetingDate.split("-")[0]);
+  var expDate = new Date(expDate.getTime() + (7 * 24 * 60 * 60 * 1000));
+  var expiryMonth = expDate.getMonth() + 1;
+  if ((expDate.getMonth() + 1) < 10)
+    expiryMonth = "0" + (expDate.getMonth() + 1);
+  var expiryDay = expDate.getDate()
+  if (expDate.getDate() < 10)
+    expiryDay = "0" + expDate.getDate();
+
+    var conferenceexpirationtime = expDate.getFullYear() + "-" + expiryMonth + "-" + expiryDay + " " + this.state.editMeetingTime;
+
+    console.log(conferenceexpirationtime)
+
+
+}
+
+else if(this.state.editMeetingDate !== "" && this.state.editMeetingTime === ""){
+
+ 
+  var conferenceexpirationtime = this.state.editResponse.conferenceexpirationtime
+
+}
+
+else if(this.state.editMeetingDate == "" && this.state.editMeetingTime !== ""){
+
+ var newVar =  this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-")
+console.log(newVar)
+
+  var expDate = new Date(this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-").split("-")[2] + "," + this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-").split("-")[1] + "," + this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-").split("-")[0]);
+  var expDate = new Date(expDate.getTime() + (7 * 24 * 60 * 60 * 1000));
+  var expiryMonth = expDate.getMonth() + 1;
+  if ((expDate.getMonth() + 1) < 10)
+    expiryMonth = "0" + (expDate.getMonth() + 1);
+  var expiryDay = expDate.getDate()
+  if (expDate.getDate() < 10)
+    expiryDay = "0" + expDate.getDate();
+
+    var conferenceexpirationtime = expDate.getFullYear() + "-" + expiryMonth + "-" + expiryDay + " " + this.state.editMeetingTime;
+console.log(conferenceexpirationtime)
+    
+
+}
+
+
+    axios.post('https://api.videomeet.in/v2/conference.php/update', qs.stringify({
+
+      authkey: 'M2atKiuCGKOo9Mj3',
+      conferencescheduletime: 
+      
+      this.state.editMeetingDate == "" && this.state.editMeetingTime === "" ? this.state.editResponse.conferencescheduletime :
+      this.state.editMeetingDate !== "" && this.state.editMeetingTime !== "" ? this.state.editMeetingDate.split("-")[2] + "-" + this.state.editMeetingDate.split("-")[1] + "-" + this.state.editMeetingDate.split("-")[0] + " " + this.state.editMeetingTime :
+      this.state.editMeetingDate !== "" && this.state.editMeetingTime === "" ? this.state.editMeetingDate.split("-")[2] + "-" + this.state.editMeetingDate.split("-")[1] + "-" + this.state.editMeetingDate.split("-")[0] + " " + this.state.editTime :
+      this.state.editResponse.conferencescheduletime
+      
+      
+      ,
+      topic: t,
+      roomname: this.state.editResponse.roomname.toLowerCase(),
+      conferenceexpirationtime: conferenceexpirationtime,
+      mode: "1",
+      room_pass: this.state.editResponse.room_pass,
+      waitingroomenable: "1",
+      confrenceid: this.state.editResponse.confrenceid
+   }), {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      "Access-Control-Allow-Origin": "*",
+    }
+
+    )
+      .then((response) => {
+        console.log(response)
+        alert(response.data.msg)
+
+      },
+        (error) => {
+          console.log(error)
+        }
+      )
+
+  
+
+
+  }
+
+
+
+
+
+
+
+
+  createFunctionality = () => {
 
 
     var a = this.state.meetingDate
@@ -208,6 +418,17 @@ class ScheduleMeetinglist extends React.Component {
 
   }
 
+  logoutHandle = () => {
+    var c = localStorage.getItem('added-credentials')
+    console.log(c)
+
+
+
+    localStorage.removeItem('added-credentials');
+    console.log(c)
+
+  }
+
   onValueChange = (event) => {
 
     this.setState({
@@ -223,12 +444,13 @@ class ScheduleMeetinglist extends React.Component {
     var logoutImg = 'https://bridge01.videomeet.in/images/logout-username.png';
     var copyIcon = "https://bridge01.videomeet.in/images/copy.jpg";
 
+
     return (
       <>
 
-      {/* schedule meeting list */}
+        {/* schedule meeting list */}
 
-        <div id="dvListScheduleMeeting" className="popBox" style={{ display: this.state.createPopup === 0 || this.props.scheduleListDisplay === 1 ? '' : 'none' }}>
+        <div id="dvListScheduleMeeting" className="popBox" style={{ display: this.state.createPopup === 0 ? '' : 'none' }}>
 
           <div className="popBoxInner">
             <div className="popBoxHeader" id="dvScheduleMeetingTitle">
@@ -238,7 +460,7 @@ class ScheduleMeetinglist extends React.Component {
 
                 </span>
               </h5>
-              <img src={logoutImg} className="shift-right" style={{ cursor: 'pointer' }} />
+              <img src={logoutImg} onClick={this.logoutHandle} className="shift-right" style={{ cursor: 'pointer' }} />
 
             </div>
 
@@ -319,7 +541,7 @@ class ScheduleMeetinglist extends React.Component {
                               <td style={{ textAlign: 'center' }}>
 
 
-                                <img src={deleteIcon} onClick={this.handleDeletePopup} className="image-size-set" alt title="Delete" />
+                                <img src={deleteIcon} onClick={() => { this.handleDeletePopup(res) }} className="image-size-set" alt title="Delete" />
 
 
                                 <span className="spn-pipe-position">{"   "}</span>
@@ -330,7 +552,7 @@ class ScheduleMeetinglist extends React.Component {
                                 <span className="spn-pipe-position">{"   "}</span>
 
 
-                                <img src={editIcon} className="image-size-set" alt title="Edit" />
+                                <img src={editIcon} onClick={() => this.editMeetingDialog(res)} className="image-size-set" alt title="Edit" />
 
 
                               </td>
@@ -373,13 +595,13 @@ class ScheduleMeetinglist extends React.Component {
 
         </div>
 
-      {/* create meeting popup */}
+        {/* create meeting popup */}
 
         <div id="dvCreateNewMeeting" className="popBox"
 
           style={{
-            display: this.state.createPopup === 1  ? 'block' : 'none'
-          
+            display: this.state.createPopup === 1 || this.state.editPopup === 1 ? 'block' : 'none'
+
 
 
           }}>
@@ -451,18 +673,20 @@ class ScheduleMeetinglist extends React.Component {
                     </tr>
 
 
-                    <tr id="editRommTr" style={{ display: 'none' }}>
+                    <tr id="editRommTr" style={{ display: this.state.editPopup === 1 ? '' : 'none' }}>
 
                       <td>
-                        <input type="text" maxLength="50" className="textBox" placeholder="Title of Meeting" id="txtMeetingTopicEdit"></input>
+                        <input type="text" maxLength="50" className="textBox" id="txtMeetingTopicEdit" placeholder={this.state.editResponse.topic}
+                          onChange={this.editMeetingTitleFun}
+                        ></input>
                       </td>
 
                       <td>
-                        <input type="text" maxLength="50" className="textBox" placeholder="Name of Room" id="txtRoomNameEdit"></input>
+                        <input disabled type="text" maxLength="50" className="textBox" id="txtRoomNameEdit" placeholder={this.state.editResponse.roomname} ></input>
                       </td>
                     </tr>
 
-                    <tr id="createRoomTr" style={{ display: 'table-row' }}>
+                    <tr id="createRoomTr" style={{ display: this.state.createPopup === 1 ? 'table-row' : 'none' }}>
                       <td>
                         <input type="text" maxLength="50" className="textBox" placeholder="Title of Meeting" id="txtMeetingTopic" onChange={this.handleMeetingTitle}></input>
                       </td>
@@ -493,22 +717,27 @@ class ScheduleMeetinglist extends React.Component {
                     <tr>
                       <td>
 
-                        <input type="text" className="textBox flatpickr-input" placeholder="DD-MM-YYYY" onChange={this.handleMeetingDate} id="txtMeetingDate" style={{ color: 'black' }}></input>
+                        <input type="text" className="textBox flatpickr-input" onChange={this.state.createPopup === 1 ? this.handleMeetingDate : this.editMeetingDateFun} placeholder={this.state.editPopup === 1 ? this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-") : "DD-MM-YYYY"}  id="txtMeetingDate" style={{ color: 'black' }}></input>
 
                       </td>
 
                       <td>
-                        <input type="text" className="textBox flatpickr-input" onChange={this.handleMeetingTime} placeholder="HH24:MM" id="txtMeetingDate" style={{ color: 'black' }}></input>
+                        <input type="text" className="textBox flatpickr-input" onChange={this.state.createPopup === 1 ? this.handleMeetingTime : this.editMeetingTimeFun} placeholder={this.state.editPopup === 1 ? this.state.editTime :"HH24:MM" }id="txtMeetingDate" style={{ color: 'black' }}
+                          ></input>
+
+
+
+
                       </td>
                     </tr>
 
                     <tr>
                       <td>
-                        <input type="text" className="textBox" placeholder={this.state.meetingPwd} onClick={this.handlePwd} id="txtRoomPassword" style={{ color: 'black', display: 'block' }}></input>
+                        <input type="text" className="textBox" placeholder={this.state.editPopup === 1 ? this.state.editResponse.room_pass : this.state.meetingPwd} onClick={this.handlePwd} id="txtRoomPassword"  style={{ color: 'black', display: 'block' }}></input>
                       </td>
 
                       <td valign="top">
-                        <div className="cstomFile" style={{ display: 'block' }}>
+                        <div className="cstomFile" style={{ display: this.state.createPopup === 1 ? 'block' : 'none' }}>
                           <label for="file-input" className="custom-file-upload fileBtn">
                             <span>Click to Upload File</span>
                           </label>
@@ -534,13 +763,13 @@ class ScheduleMeetinglist extends React.Component {
             <div className="popBoxFooter">
               <button className="cancelButton" onClick={this.newMeetingClose}>Close</button>
 
-              <button id="butSave" style={{ display: 'inline-block' }}>
-                <span onClick={this.saveBtn}>Save</span>
+              <button id="butSave" onClick={this.createFunctionality} style={{ display: this.state.createPopup === 1 ? 'inline-block' : 'none' }}>
+                <span >Save</span>
               </button>
 
-              <button id="butEdit" style={{ display: 'none' }}>
+              <button id="butEdit" onClick={this.editFunctionality} style={{ display: this.state.editPopup === 1 ? 'inline-block' : 'none' }}>
 
-                <span>Save</span>
+                <span >Save</span>
               </button>
             </div>
           </div>
@@ -651,7 +880,7 @@ class ScheduleMeetinglist extends React.Component {
             <div className="popBoxBody relativeDiv">
               <span className="relativeDivBlock" id="spnDeleteMessageBody">
                 <span>
-                  <h6>Following will be deleted from the Room - {this.props.uname}.</h6>
+                  <h6>Following will be deleted from the Room - {this.state.deleteRoomName}.</h6>
           1. Document
           <br></br>
           2. Recording
@@ -673,7 +902,7 @@ class ScheduleMeetinglist extends React.Component {
               </button>
 
               <span id="spnDeleteMessageBut"></span>
-              <button>
+              <button onClick={this.deleteFunctionality}>
                 <span>Yes, Delete</span>
               </button>
             </div>
@@ -681,7 +910,7 @@ class ScheduleMeetinglist extends React.Component {
           </div>
         </div>
 
-      {/* Add Panel popup */}
+        {/* Add Panel popup */}
 
         {this.state.panelistDialog === 1 ?
           <Panelist

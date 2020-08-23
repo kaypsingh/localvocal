@@ -16,12 +16,98 @@ class App extends React.Component {
       cancelButton: 0,
       name: '',
       username: '',
+      password: '',
+      loginCredentials: [],
+     
+      login: 0,
       dataSource: [],
       parentData: {},
       dataEntry: '',
       scheduleListDisplay: 0
     }
   }
+
+  
+  handlePwdChange = (event) => {
+    this.setState({ password: event.target.value });
+  }
+
+  
+
+
+  handleLogin = () => {
+
+    if (this.state.username === '' && this.state.password === '') { alert('enter username and password') }
+
+    else if(this.state.username === '' && this.state.password !== '') {alert('enter username')}
+
+    else if(this.state.username !== '' && this.state.password === '') {alert('enter password')}
+
+    else {
+
+      axios.post('https://api.videomeet.in/v2/authentication.php/', qs.stringify({
+
+        authkey: 'M2atKiuCGKOo9Mj3',
+        username: this.state.username,
+        password: this.state.password,
+
+      }), {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        "Access-Control-Allow-Origin": "*",
+      }
+
+      )
+        .then((response) => {
+          console.log(response)
+
+          const loginCredentials = localStorage.getItem('added-credentials')
+          // console.log(loginCredentials.length)
+
+          const parsedrest = []
+          parsedrest.push({ username: this.state.username, password: this.state.password })
+
+
+          localStorage.setItem('added-credentials', JSON.stringify(parsedrest));
+          console.log(loginCredentials)
+        
+          if (response.request.readyState === 4 && response.request.status === 200) {
+
+            if (response.data.status === 1) {
+
+           var name = response.data.data.name
+
+           if(loginCredentials !== null)   {
+
+              this.setState({ login: 1  }, () => {this.getName(name)})
+
+           }else{
+             
+           }
+
+
+            }
+
+            else if (response.data.status === 0) {
+
+              alert('Please check Username and Password')
+
+            }
+          }
+        },
+          (error) => {
+            console.log(error)
+          }
+        )
+
+
+    }
+
+  }
+
+
+
+
+
 
 
   scheduleApi = () => {
@@ -155,11 +241,14 @@ class App extends React.Component {
           name={this.state.name}
           getName={this.getName}
           username={this.state.username}
+          handleLogin={this.handleLogin}
           handleUnameChange={this.handleUnameChange}
+          handlePwdChange={this.handlePwdChange}
           scheduleApi={this.scheduleApi}
           dataSource={this.state.dataSource}
           parentData={this.state.parentData}
           scheduleListDisplay={this.state.scheduleListDisplay}
+          login={this.state.login}
         ></LoginMeeting>
 
     )

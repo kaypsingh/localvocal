@@ -10,97 +10,86 @@ class LoginMeeting extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      scheduleList: 0,
-      loginCredentials: [],
-      password: '',
-      login: 0
+   
     }
   }
 
  
 
-  handlePwdChange = (event) => {
-    this.setState({ password: event.target.value });
-  }
 
 
 
+  // handleLogin = () => {
 
-  handleLogin = () => {
+  //   if (this.props.username === '' && this.state.password === '') { alert('enter username and password') }
 
-    if (this.props.username === '' && this.state.password === '') { alert('enter username and password') }
+  //   else if(this.props.username === '' && this.state.password !== '') {alert('enter username')}
 
-    else if(this.props.username === '' && this.state.password !== '') {alert('enter username')}
+  //   else if(this.props.username !== '' && this.state.password === '') {alert('enter password')}
 
-    else if(this.props.username !== '' && this.state.password === '') {alert('enter password')}
+  //   else {
 
-    else {
+  //     axios.post('https://api.videomeet.in/v2/authentication.php/', qs.stringify({
 
-      axios.post('https://api.videomeet.in/v2/authentication.php/', qs.stringify({
+  //       authkey: 'M2atKiuCGKOo9Mj3',
+  //       username: this.props.username,
+  //       password: this.state.password,
 
-        authkey: 'M2atKiuCGKOo9Mj3',
-        username: this.props.username,
-        password: this.state.password,
+  //     }), {
+  //       'Content-Type': 'application/x-www-form-urlencoded',
+  //       "Access-Control-Allow-Origin": "*",
+  //     }
 
-      }), {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        "Access-Control-Allow-Origin": "*",
-      }
+  //     )
+  //       .then((response) => {
+  //         console.log(response)
 
-      )
-        .then((response) => {
-          console.log(response)
+  //         const loginCredentials = localStorage.getItem('added-credentials')
+  //         console.log(loginCredentials.length)
 
-          const loginCredentials = localStorage.getItem('added-credentials')
-          console.log(loginCredentials.length)
-
-          const parsedrest = []
-          parsedrest.push({ username: this.props.username, password: this.state.password })
+  //         const parsedrest = []
+  //         parsedrest.push({ username: this.props.username, password: this.state.password })
 
 
-          localStorage.setItem('added-credentials', JSON.stringify(parsedrest));
-          console.log(loginCredentials)
+  //         localStorage.setItem('added-credentials', JSON.stringify(parsedrest));
+  //         console.log(loginCredentials)
         
-          if (response.request.readyState === 4 && response.request.status === 200) {
+  //         if (response.request.readyState === 4 && response.request.status === 200) {
 
-            if (response.data.status === 1) {
+  //           if (response.data.status === 1) {
 
-           var name = response.data.data.name
+  //          var name = response.data.data.name
 
-           if(loginCredentials.length !== 0) {
+  //          if(loginCredentials.length !== 0) {
 
-              this.setState({ login: 1  }, () => {this.props.getName(name)})
+  //             this.setState({ login: 1  }, () => {this.props.getName(name)})
 
-           }else{
+  //          }else{
              
-           }
+  //          }
 
 
-            }
+  //           }
 
-            else if (response.data.status === 0) {
+  //           else if (response.data.status === 0) {
 
-              alert('Please check Username and Password')
+  //             alert('Please check Username and Password')
 
-            }
-          }
-        },
-          (error) => {
-            console.log(error)
-          }
-        )
-
-
-    }
-
-  }
+  //           }
+  //         }
+  //       },
+  //         (error) => {
+  //           console.log(error)
+  //         }
+  //       )
 
 
-  LoginMeetinglist = () => {
-    this.setState({ scheduleList: 1 })
-  }
+  //   }
+
+  // }
 
 
+ 
 
   render() {
 
@@ -108,7 +97,7 @@ class LoginMeeting extends React.Component {
     return (
 
 
-      this.state.login === 0 ?
+      this.props.login === 0 && this.props.name === ''?
         <>
 
           <div className="popBoxInner">
@@ -126,20 +115,20 @@ class LoginMeeting extends React.Component {
 
               </label>
               <input type="password" className="textBox" id="txtPassword" placeholder="password"
-                onChange={this.handlePwdChange}
+                onChange={this.props.handlePwdChange}
               />
             </div>
 
             <div className="popBoxFooter">
 
               <button className="cancelButton" onClick={this.props.cancelBtn} >Cancel</button>
-              <button className="loginButton" onClick={this.handleLogin} >Login</button>
+              <button className="loginButton" onClick={this.props.handleLogin} >Login</button>
             </div>
           </div>
 
         </>
 
-        :
+        : this.props.login === 1 && this.props.name !== "" ?
 
        <ScheduleMeetinglist
        bc = {this.props.name}
@@ -152,6 +141,8 @@ class LoginMeeting extends React.Component {
        >
 
        </ScheduleMeetinglist>
+
+       : ''
 
 
     )
