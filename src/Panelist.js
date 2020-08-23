@@ -21,9 +21,9 @@ class Panelist extends React.Component {
         }
     }
 
-    addParticipant = () => {
+    addParticipant = (e) => {
 
-
+      
 // this.setState({clickedSave: 1})
 
         if (this.state.ishost === false) {

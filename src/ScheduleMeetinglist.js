@@ -43,7 +43,10 @@ class ScheduleMeetinglist extends React.Component {
       deleteRoomName: '',
       parentResponse: {},
       editResponse: {},
-      dateFormat: ''
+      dateFormat: '',
+
+      panelConfrenceId: '',
+      panelRoomName: ''
 
     }
   }
@@ -57,9 +60,10 @@ class ScheduleMeetinglist extends React.Component {
     this.setState({ hideDeletePopup: 1 })
   }
 
-  handlePanelistPopup = () => {
-    console.log('ji')
-    this.setState({ hidePanelistPopup: 0 })
+  handlePanelistPopup = (r) => {
+  console.log(r.confrenceid)
+
+    this.setState({ hidePanelistPopup: 0 , panelConfrenceId: r.confrenceid , panelRoomName: r.roomname})
   }
 
   handleDeletePopup = (r) => {
@@ -529,7 +533,7 @@ console.log(conferenceexpirationtime)
 
                               <td style={{ textAlign: 'center' }}>
 
-                                <img src={panelistIcon} onClick={this.handlePanelistPopup} className="image-size-set" alt title="Panelist" />
+                                <img src={panelistIcon} onClick={() => {this.handlePanelistPopup(res) }} className="image-size-set" alt title="Panelist" />
 
 
                                 <span className="spn-pipe-position">{"  "}</span>
@@ -912,11 +916,11 @@ console.log(conferenceexpirationtime)
 
         {/* Add Panel popup */}
 
-        {this.state.panelistDialog === 1 ?
+        {this.state.panelistDialog === 1 || this.state.hidePanelistPopup === 0?
           <Panelist
 
-            conferId={this.state.confId}
-            meetingRoomName={this.state.meetingRoomName}
+            conferId={this.state.hidePanelistPopup === 0 ? this.state.panelConfrenceId : this.state.panelistDialog === 1 ? this.state.confId : ''}
+            meetingRoomName={this.state.hidePanelistPopup === 0 ? this.state.panelRoomName : this.state.panelistDialog === 1 ? this.state.meetingRoomName : ''}
             scheduleApi={this.props.scheduleApi}
 
           ></Panelist> : ''
