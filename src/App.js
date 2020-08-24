@@ -6,6 +6,10 @@ import axios from 'axios';
 import LoginMeeting from './LoginMeeting'
 import ScheduleMeetinglist from './ScheduleMeetinglist'
 import Panelist from './Panelist'
+import DocumentList from './DocumentList'
+import RecordingList from './RecordingList'
+import ChatList from './ChatList';
+import HistoryList from './HistoryList.js';
 
 class App extends React.Component {
 

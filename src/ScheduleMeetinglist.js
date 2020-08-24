@@ -1,7 +1,11 @@
 import React from 'react';
 import qs from 'qs'
 import axios from 'axios';
-import Panelist from './Panelist'
+import Panelist from './Panelist';
+import DocumentList from './DocumentList';
+import RecordingList from './RecordingList';
+import ChatList from './ChatList';
+import HistoryList from './HistoryList.js';
 
 class ScheduleMeetinglist extends React.Component {
 
@@ -46,7 +50,19 @@ class ScheduleMeetinglist extends React.Component {
       dateFormat: '',
 
       panelConfrenceId: '',
-      panelRoomName: ''
+      panelRoomName: '',
+
+      panelistActionPopup: 0,
+      panelActionRoomname: '',
+      panelActionPwd: '',
+      panelActionResponse: [],
+      panelActionDataMsg: "",
+
+      documentPopup: 0,
+      recordingpopup: 0,
+      chatPopup: 0,
+      historyPopup: 0
+
 
     }
   }
@@ -60,10 +76,81 @@ class ScheduleMeetinglist extends React.Component {
     this.setState({ hideDeletePopup: 1 })
   }
 
-  handlePanelistPopup = (r) => {
-  console.log(r.confrenceid)
 
-    this.setState({ hidePanelistPopup: 0 , panelConfrenceId: r.confrenceid , panelRoomName: r.roomname})
+  seeListOfDocuments = () => {
+    this.setState({ documentPopup: 1 })
+
+  }
+
+  closeListofDocuments = () => {
+    this.setState({ documentPopup: 0 })
+
+  }
+
+  myRecordings = () => {
+    this.setState({ recordingpopup: 1 })
+  }
+
+  closeMyRecordings = () => {
+    this.setState({ recordingpopup: 0 })
+  }
+
+  myChats = () => {
+    this.setState({ chatPopup: 1 })
+  }
+
+  closeMyChats = () => {
+    this.setState({ chatPopup: 0 })
+  }
+
+  myHistory = () => {
+    this.setState({ historyPopup: 1})
+  }
+
+  closeMyHistory = () => {
+    this.setState({ historyPopup: 0})
+  }
+
+  listPanelistAction = (r) => {
+    this.setState({ panelistActionPopup: 1, panelActionRoomname: r.roomname, panelActionPwd: r.room_pass })
+
+
+    axios.post('https://api.videomeet.in/v2/participants.php/participantlist', qs.stringify({
+
+      authkey: 'M2atKiuCGKOo9Mj3',
+      conferenceid: r.confrenceid
+
+    }), {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      "Access-Control-Allow-Origin": "*",
+    }
+
+    )
+      .then((response) => {
+
+        console.log(response.data.msg)
+
+        if (response.data.msg === "participants list fetched successfully") {
+
+          this.setState({ panelActionResponse: response.data.data, panelActionDataMsg: response.data.msg })
+        }
+
+
+
+      },
+        (error) => {
+          console.log(error)
+        }
+      )
+
+
+
+  }
+
+  handlePanelistPopup = (r) => {
+    console.log(r.confrenceid)
+
+    this.setState({ hidePanelistPopup: 0, panelConfrenceId: r.confrenceid, panelRoomName: r.roomname })
   }
 
   handleDeletePopup = (r) => {
@@ -87,7 +174,7 @@ class ScheduleMeetinglist extends React.Component {
   editMeetingTitleFun = (event) => {
 
     console.log(this.state.editResponse)
-    this.setState({editMeetingTitle: event.target.value})
+    this.setState({ editMeetingTitle: event.target.value })
   }
 
   handleMeetingDate = (event) => {
@@ -96,7 +183,7 @@ class ScheduleMeetinglist extends React.Component {
   }
 
   editMeetingDateFun = (event) => {
-  this.setState({editMeetingDate: event.target.value })
+    this.setState({ editMeetingDate: event.target.value })
   }
 
   handleMeetingRoomName = (event) => {
@@ -156,7 +243,7 @@ class ScheduleMeetinglist extends React.Component {
 
   editMeetingTimeFun = (event) => {
     console.log(event.target.value)
-    this.setState({ editMeetingTime: event.target.value})
+    this.setState({ editMeetingTime: event.target.value })
   }
 
   handlePwd = () => {
@@ -240,78 +327,78 @@ class ScheduleMeetinglist extends React.Component {
     // if date unchanged time changed----time not updating (data is going right)
     console.log('updating')
 
-console.log(this.state.editMeetingTime)
+    console.log(this.state.editMeetingTime)
 
-if(this.state.editMeetingTitle === "" ){
-  var t = this.state.editResponse.topic
-} else{
-  var t = this.state.editMeetingTitle
-}
-
-
-if(this.state.editMeetingDate == "" && this.state.editMeetingTime === ""){
+    if (this.state.editMeetingTitle === "") {
+      var t = this.state.editResponse.topic
+    } else {
+      var t = this.state.editMeetingTitle
+    }
 
 
-  var conferenceexpirationtime = this.state.editResponse.conferenceexpirationtime
-
-}else if(this.state.editMeetingDate !== "" && this.state.editMeetingTime !== ""){
+    if (this.state.editMeetingDate == "" && this.state.editMeetingTime === "") {
 
 
-  var expDate = new Date(this.state.editMeetingDate.split("-")[2] + "," + this.state.editMeetingDate.split("-")[1] + "," + this.state.editMeetingDate.split("-")[0]);
-  var expDate = new Date(expDate.getTime() + (7 * 24 * 60 * 60 * 1000));
-  var expiryMonth = expDate.getMonth() + 1;
-  if ((expDate.getMonth() + 1) < 10)
-    expiryMonth = "0" + (expDate.getMonth() + 1);
-  var expiryDay = expDate.getDate()
-  if (expDate.getDate() < 10)
-    expiryDay = "0" + expDate.getDate();
+      var conferenceexpirationtime = this.state.editResponse.conferenceexpirationtime
 
-    var conferenceexpirationtime = expDate.getFullYear() + "-" + expiryMonth + "-" + expiryDay + " " + this.state.editMeetingTime;
-
-    console.log(conferenceexpirationtime)
+    } else if (this.state.editMeetingDate !== "" && this.state.editMeetingTime !== "") {
 
 
-}
+      var expDate = new Date(this.state.editMeetingDate.split("-")[2] + "," + this.state.editMeetingDate.split("-")[1] + "," + this.state.editMeetingDate.split("-")[0]);
+      var expDate = new Date(expDate.getTime() + (7 * 24 * 60 * 60 * 1000));
+      var expiryMonth = expDate.getMonth() + 1;
+      if ((expDate.getMonth() + 1) < 10)
+        expiryMonth = "0" + (expDate.getMonth() + 1);
+      var expiryDay = expDate.getDate()
+      if (expDate.getDate() < 10)
+        expiryDay = "0" + expDate.getDate();
 
-else if(this.state.editMeetingDate !== "" && this.state.editMeetingTime === ""){
+      var conferenceexpirationtime = expDate.getFullYear() + "-" + expiryMonth + "-" + expiryDay + " " + this.state.editMeetingTime;
 
- 
-  var conferenceexpirationtime = this.state.editResponse.conferenceexpirationtime
+      console.log(conferenceexpirationtime)
 
-}
 
-else if(this.state.editMeetingDate == "" && this.state.editMeetingTime !== ""){
+    }
 
- var newVar =  this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-")
-console.log(newVar)
+    else if (this.state.editMeetingDate !== "" && this.state.editMeetingTime === "") {
 
-  var expDate = new Date(this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-").split("-")[2] + "," + this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-").split("-")[1] + "," + this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-").split("-")[0]);
-  var expDate = new Date(expDate.getTime() + (7 * 24 * 60 * 60 * 1000));
-  var expiryMonth = expDate.getMonth() + 1;
-  if ((expDate.getMonth() + 1) < 10)
-    expiryMonth = "0" + (expDate.getMonth() + 1);
-  var expiryDay = expDate.getDate()
-  if (expDate.getDate() < 10)
-    expiryDay = "0" + expDate.getDate();
 
-    var conferenceexpirationtime = expDate.getFullYear() + "-" + expiryMonth + "-" + expiryDay + " " + this.state.editMeetingTime;
-console.log(conferenceexpirationtime)
-    
+      var conferenceexpirationtime = this.state.editResponse.conferenceexpirationtime
 
-}
+    }
+
+    else if (this.state.editMeetingDate == "" && this.state.editMeetingTime !== "") {
+
+      var newVar = this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-")
+      console.log(newVar)
+
+      var expDate = new Date(this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-").split("-")[2] + "," + this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-").split("-")[1] + "," + this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-").split("-")[0]);
+      var expDate = new Date(expDate.getTime() + (7 * 24 * 60 * 60 * 1000));
+      var expiryMonth = expDate.getMonth() + 1;
+      if ((expDate.getMonth() + 1) < 10)
+        expiryMonth = "0" + (expDate.getMonth() + 1);
+      var expiryDay = expDate.getDate()
+      if (expDate.getDate() < 10)
+        expiryDay = "0" + expDate.getDate();
+
+      var conferenceexpirationtime = expDate.getFullYear() + "-" + expiryMonth + "-" + expiryDay + " " + this.state.editMeetingTime;
+      console.log(conferenceexpirationtime)
+
+
+    }
 
 
     axios.post('https://api.videomeet.in/v2/conference.php/update', qs.stringify({
 
       authkey: 'M2atKiuCGKOo9Mj3',
-      conferencescheduletime: 
-      
-      this.state.editMeetingDate == "" && this.state.editMeetingTime === "" ? this.state.editResponse.conferencescheduletime :
-      this.state.editMeetingDate !== "" && this.state.editMeetingTime !== "" ? this.state.editMeetingDate.split("-")[2] + "-" + this.state.editMeetingDate.split("-")[1] + "-" + this.state.editMeetingDate.split("-")[0] + " " + this.state.editMeetingTime :
-      this.state.editMeetingDate !== "" && this.state.editMeetingTime === "" ? this.state.editMeetingDate.split("-")[2] + "-" + this.state.editMeetingDate.split("-")[1] + "-" + this.state.editMeetingDate.split("-")[0] + " " + this.state.editTime :
-      this.state.editResponse.conferencescheduletime
-      
-      
+      conferencescheduletime:
+
+        this.state.editMeetingDate == "" && this.state.editMeetingTime === "" ? this.state.editResponse.conferencescheduletime :
+          this.state.editMeetingDate !== "" && this.state.editMeetingTime !== "" ? this.state.editMeetingDate.split("-")[2] + "-" + this.state.editMeetingDate.split("-")[1] + "-" + this.state.editMeetingDate.split("-")[0] + " " + this.state.editMeetingTime :
+            this.state.editMeetingDate !== "" && this.state.editMeetingTime === "" ? this.state.editMeetingDate.split("-")[2] + "-" + this.state.editMeetingDate.split("-")[1] + "-" + this.state.editMeetingDate.split("-")[0] + " " + this.state.editTime :
+              this.state.editResponse.conferencescheduletime
+
+
       ,
       topic: t,
       roomname: this.state.editResponse.roomname.toLowerCase(),
@@ -320,7 +407,7 @@ console.log(conferenceexpirationtime)
       room_pass: this.state.editResponse.room_pass,
       waitingroomenable: "1",
       confrenceid: this.state.editResponse.confrenceid
-   }), {
+    }), {
       'Content-Type': 'application/x-www-form-urlencoded',
       "Access-Control-Allow-Origin": "*",
     }
@@ -336,7 +423,7 @@ console.log(conferenceexpirationtime)
         }
       )
 
-  
+
 
 
   }
@@ -533,12 +620,12 @@ console.log(conferenceexpirationtime)
 
                               <td style={{ textAlign: 'center' }}>
 
-                                <img src={panelistIcon} onClick={() => {this.handlePanelistPopup(res) }} className="image-size-set" alt title="Panelist" />
+                                <img src={panelistIcon} onClick={() => { this.handlePanelistPopup(res) }} className="image-size-set" alt title="Panelist" />
 
 
                                 <span className="spn-pipe-position">{"  "}</span>
 
-                                <img src={roomIcon} className="image-size-set" alt title="Room" />
+                                <img src={roomIcon} onClick={() => { this.listPanelistAction(res) }} className="image-size-set" alt title="Room" />
 
 
                               </td>
@@ -599,7 +686,7 @@ console.log(conferenceexpirationtime)
 
         </div>
 
-        {/* create meeting popup */}
+        {/* create/edit meeting  */}
 
         <div id="dvCreateNewMeeting" className="popBox"
 
@@ -721,13 +808,13 @@ console.log(conferenceexpirationtime)
                     <tr>
                       <td>
 
-                        <input type="text" className="textBox flatpickr-input" onChange={this.state.createPopup === 1 ? this.handleMeetingDate : this.editMeetingDateFun} placeholder={this.state.editPopup === 1 ? this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-") : "DD-MM-YYYY"}  id="txtMeetingDate" style={{ color: 'black' }}></input>
+                        <input type="text" className="textBox flatpickr-input" onChange={this.state.createPopup === 1 ? this.handleMeetingDate : this.editMeetingDateFun} placeholder={this.state.editPopup === 1 ? this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-") : "DD-MM-YYYY"} id="txtMeetingDate" style={{ color: 'black' }}></input>
 
                       </td>
 
                       <td>
-                        <input type="text" className="textBox flatpickr-input" onChange={this.state.createPopup === 1 ? this.handleMeetingTime : this.editMeetingTimeFun} placeholder={this.state.editPopup === 1 ? this.state.editTime :"HH24:MM" }id="txtMeetingDate" style={{ color: 'black' }}
-                          ></input>
+                        <input type="text" className="textBox flatpickr-input" onChange={this.state.createPopup === 1 ? this.handleMeetingTime : this.editMeetingTimeFun} placeholder={this.state.editPopup === 1 ? this.state.editTime : "HH24:MM"} id="txtMeetingDate" style={{ color: 'black' }}
+                        ></input>
 
 
 
@@ -737,7 +824,7 @@ console.log(conferenceexpirationtime)
 
                     <tr>
                       <td>
-                        <input type="text" className="textBox" placeholder={this.state.editPopup === 1 ? this.state.editResponse.room_pass : this.state.meetingPwd} onClick={this.handlePwd} id="txtRoomPassword"  style={{ color: 'black', display: 'block' }}></input>
+                        <input type="text" className="textBox" placeholder={this.state.editPopup === 1 ? this.state.editResponse.room_pass : this.state.meetingPwd} onClick={this.handlePwd} id="txtRoomPassword" style={{ color: 'black', display: 'block' }}></input>
                       </td>
 
                       <td valign="top">
@@ -780,7 +867,7 @@ console.log(conferenceexpirationtime)
 
         </div>
 
-
+        {/* share action */}
 
         <div id="dvShareScheduleDetail" className="popBox" style={{ display: this.state.sharePopup === 1 ? 'block' : 'none' }}>
           <div className="popBoxInner">
@@ -873,6 +960,8 @@ console.log(conferenceexpirationtime)
 
         </div>
 
+        {/* delete action */}
+
         <div id="dvDeleteMessage" className="popBox" style={{ display: this.state.hideDeletePopup === 0 ? 'block' : 'none' }}>
           <div className="popBoxInner">
             <div className="popBoxHeader" id="dvDeleteMessageTitle">
@@ -914,9 +1003,212 @@ console.log(conferenceexpirationtime)
           </div>
         </div>
 
+
+        <div id="dvListParticipant" className="popBox" style={{ display: this.state.panelistActionPopup === 1 ? 'block' : 'none' }}>
+          <div className="popBoxInner">
+            <div className="popBoxHeader" id="dvListParticipantTitle" >
+              <h5>
+                <span>List of panelist in {this.state.panelActionRoomname}</span>
+              </h5>
+
+              <span style={{ float: "right", position: "relative", top: -25 }}>
+                <h5>
+                  <span>Password : {this.state.panelActionPwd}</span>
+                </h5>
+              </span>
+            </div>
+
+            <div className="popBoxBody" id="dvListParticipantTable" style={{ overflowY: 'auto', maxHeight: 417 }}>
+              <table className="tableBox" id="tblListParticipant" style={{ "width": "100%" }}>
+                <tbody>
+                  <tr>
+                    <th style={{ "width": "20%" }}>
+                      <span>Name</span>
+                    </th>
+
+                    <th style={{ "width": "30%" }}>
+                      <span>Email Address</span>
+                    </th>
+
+                    <th style={{ "width": "10%" }}>
+                      <span>Code</span>
+                    </th>
+
+                    <th style={{ "width": "15%" }}>
+                      <span>Active</span>
+                    </th>
+
+                    <th style={{ "width": "15%" }}>
+                      <span>Co-Host</span>
+                    </th>
+
+                    <th style={{ "width": "5%", textAlign: 'center' }}>
+                      <span>Action</span>
+                    </th>
+                  </tr>
+
+                  {
+
+                    //  this.state.panelActionData.data.msg === "participants list fetched successfully" ?
+
+                    this.state.panelActionDataMsg === "participants list fetched successfully" ?
+
+                      this.state.panelActionResponse.map((par, k) => {
+
+                        console.log(par)
+                        var deleteActionIcon = "https://bridge01.videomeet.in/images/delete-room.png"
+                        var shareActionIcon = "https://bridge01.videomeet.in/images/share_room.png"
+
+                        return (
+                          <>
+                            <tr>
+                              <td>{par.name}</td>
+                              <td>{par.email}</td>
+                              <td>{par.code}</td>
+                              <td>
+                                <input type="radio" id="radYesCodeStatus0" checked={par.code_expire == "1"} name="radCodeStatus0" style={{ cursor: 'pointer' }}></input>
+
+                                <label for="radYesCodeStatus">
+                                  <span>Yes</span>
+                                </label>
+
+                                <input type="radio" id="radNoCodeStatus0" checked={par.code_expire == "0"} name="radCodeStatus0" style={{ cursor: 'pointer' }}></input>
+
+                                <label for="radNoCodeStatus">
+                                  <span>No</span>
+                                </label>
+
+                              </td>
+
+                              <td>
+                                <input type="radio" id="radYesCoHost0" checked={par.ishost == 1} name="radCoHost0" style={{ cursor: 'pointer' }}></input>
+
+                                <label for="radYesCoHost">
+                                  <span>Yes</span>
+                                </label>
+
+                                <input type="radio" id="radNoCoHost0" checked={par.ishost == 0} name="radCoHost0" style={{ cursor: 'pointer' }}></input>
+
+                                <label for="radNoCoHost">
+                                  <span>No</span>
+                                </label>
+                              </td>
+
+                              <td style={{ textAlign: 'center' }}>
+
+                                <a href="">
+                                  <img src={deleteActionIcon} className="image-size-set" alt title="Delete" />
+                                </a>
+
+                                <br></br>
+                                <br></br>
+
+                                <a href="">
+                                  <img src={shareActionIcon} className="image-size-set" alt title="Copy and Share" />
+                                </a>
+
+                              </td>
+
+                            </tr>
+                          </>
+                        )
+
+                      })
+
+                      :
+
+                      <tr>
+                        <td colSpan="6" >
+                          <span>No Records Found.</span>
+                        </td>
+                      </tr>
+
+                  }
+
+                </tbody>
+              </table>
+            </div>
+
+            <div className="popBoxFooter">
+              <button className="cancelButton" >
+                <span>Close</span>
+              </button>
+
+              <span id="spnShowDocuments">
+
+                <button onClick={this.seeListOfDocuments}>
+                  <span>Document</span>
+                </button>
+
+                <button onClick={this.myRecordings}>
+                  <span>My Recording</span>
+                </button>
+
+                <button onClick={this.myChats}>
+                  <span>My Chat</span>
+                </button>
+
+                <button onClick={this.myHistory}>
+                  <span>History</span>
+                </button>
+
+              </span>
+            </div>
+
+
+          </div>
+        </div>
+
+
+        {
+
+          this.state.documentPopup === 1 ?
+
+            <DocumentList
+            closeListofDocuments = {this.closeListofDocuments}
+            panelActionRoomname = {this.state.panelActionRoomname}
+            panelUsername = {this.props.username}
+            ></DocumentList>
+
+
+            : ''
+        }
+
+        {
+          this.state.recordingpopup === 1 ?
+
+          <RecordingList
+          closeMyRecordings = {this.closeMyRecordings}
+          recordingActionRoomname = {this.state.panelActionRoomname}
+          recordingUsername = {this.props.username}
+          ></RecordingList> : ''
+        }
+
+
+
+        {
+          this.state.chatPopup === 1 ?
+
+          <ChatList
+          closeMyChats = {this.closeMyChats}
+          chatActionRoomname = {this.state.panelActionRoomname}
+          ></ChatList> : ''
+        }
+
+
+{
+          this.state.historyPopup === 1 ?
+
+          <HistoryList
+          closeMyHistory = {this.closeMyHistory}
+          historyActionRoomname = {this.state.panelActionRoomname}
+          ></HistoryList> : ''
+        }
+
+
         {/* Add Panel popup */}
 
-        {this.state.panelistDialog === 1 || this.state.hidePanelistPopup === 0?
+        {this.state.panelistDialog === 1 || this.state.hidePanelistPopup === 0 ?
           <Panelist
 
             conferId={this.state.hidePanelistPopup === 0 ? this.state.panelConfrenceId : this.state.panelistDialog === 1 ? this.state.confId : ''}
