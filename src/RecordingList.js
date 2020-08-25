@@ -8,7 +8,7 @@ class RecordingList extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            documentMessage: ''
+            recordingMessage: ''
 
         }
     }
@@ -21,8 +21,8 @@ class RecordingList extends React.Component {
         axios.post('https://api.videomeet.in/v2/conference_recording.php/recordinglist', qs.stringify({
 
             authkey: 'M2atKiuCGKOo9Mj3',
-           roomname: this.props.recordingActionRoomname,
-           
+            roomname: this.props.recordingActionRoomname,
+
         }), {
             'Content-Type': 'application/x-www-form-urlencoded',
             "Access-Control-Allow-Origin": "*",
@@ -35,7 +35,9 @@ class RecordingList extends React.Component {
 
                 alert(response.data.msg)
 
-                // this.setState({documentMessage: response.data.msg})
+
+
+                this.setState({ recordingMessage: response.data.msg })
 
 
             },
@@ -49,10 +51,11 @@ class RecordingList extends React.Component {
 
 
     componentDidMount() {
-       this.fetchRecordingsResult()
+        this.fetchRecordingsResult()
     }
 
     render() {
+
 
 
         return (
@@ -98,27 +101,45 @@ class RecordingList extends React.Component {
 
                                     </tr>
 
+                                    {
 
-                                    <tr>
-                                        <td colSpan="5">
-                                            <span>Recording not available</span>
-                                        </td>
-                                    </tr>
+                                        this.state.recordingMessage !== "no record found" ?
 
+                                            <tr>
+                                                <td>
+                                                    <a style={{ color: 'green' }}>{}</a>
+                                                </td>
 
+                                                <td></td>
+                                                <td></td>
+                                                <td style={{ color: 'red' }}></td>
+
+                                                <td style={{ textAlign: 'center' }}>
+                                                    {/* <img src={} title="Delete file" style={{width: 12 , cursor: 'pointer'}}></img> */}
+                                                </td>
+                                            </tr>
+
+                                            :
+                                            <tr>
+                                                <td colSpan="5">
+                                                    <span>Recording not available</span>
+                                                </td>
+                                            </tr>
+
+                                    }
                                 </tbody>
                             </table>
                         </div>
-                  
-                  
-                  <div className="popBoxFooter">
-                      <span id="spnHideMyRecording">
 
-                          <button className="cancelButton" onClick={this.props.closeMyRecordings} >
-                              <span>Close</span>
-                          </button>
-                      </span>
-                  </div>
+
+                        <div className="popBoxFooter">
+                            <span id="spnHideMyRecording">
+
+                                <button className="cancelButton" onClick={this.props.closeMyRecordings} >
+                                    <span>Close</span>
+                                </button>
+                            </span>
+                        </div>
                     </div>
                 </div>
 

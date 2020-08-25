@@ -66,6 +66,9 @@ class LoginMeeting extends React.Component {
        dataSource={this.props.dataSource}
        parentData={this.props.parentData}
 
+       newMeetingDialog={this.props.newMeetingDialog}
+       newMeetingClose={this.props.newMeetingClose}
+       createPopup={this.props.createPopup}
        >
 
        </ScheduleMeetinglist>

@@ -16,6 +16,8 @@ class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+
+      createPopup: 0,
       meetingbox: 0,
       cancelButton: 0,
       name: '',
@@ -31,6 +33,15 @@ class App extends React.Component {
     }
   }
 
+
+  newMeetingDialog = () => {
+    this.setState({ createPopup: 1 })
+  }
+
+  newMeetingClose = () => {
+    this.setState({ createPopup: 0 })
+    // , this.scheduleApi
+  }
   
   handlePwdChange = (event) => {
     this.setState({ password: event.target.value });
@@ -117,7 +128,7 @@ class App extends React.Component {
   scheduleApi = () => {
 
 
-    this.setState({ scheduleListDisplay: 1 })
+    this.setState({ createPopup: 0 })
     axios.post('https://api.videomeet.in/v2/conference.php/confrencelist', qs.stringify({
 
       authkey: 'M2atKiuCGKOo9Mj3',
@@ -253,6 +264,10 @@ class App extends React.Component {
           parentData={this.state.parentData}
           scheduleListDisplay={this.state.scheduleListDisplay}
           login={this.state.login}
+
+          newMeetingDialog={this.newMeetingDialog}
+          newMeetingClose={this.newMeetingClose}
+          createPopup={this.state.createPopup}
         ></LoginMeeting>
 
     )

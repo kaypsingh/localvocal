@@ -15,7 +15,7 @@ class ScheduleMeetinglist extends React.Component {
 
 
       editPopup: 0,
-      createPopup: 0,
+      // createPopup: 0,
       meetingTitle: '',
       meetingDate: new Date(),
       meetingPwd: 'Meeting Password',
@@ -254,9 +254,9 @@ class ScheduleMeetinglist extends React.Component {
   }
 
 
-  newMeetingDialog = () => {
-    this.setState({ createPopup: 1 })
-  }
+  // newMeetingDialog = () => {
+  //   this.setState({ createPopup: 1 })
+  // }
 
   editMeetingDialog = (r) => {
     console.log(r)
@@ -269,9 +269,9 @@ class ScheduleMeetinglist extends React.Component {
 
   }
 
-  newMeetingClose = () => {
-    this.setState({ createPopup: 0 }, this.props.scheduleApi)
-  }
+  // newMeetingClose = () => {
+  //   this.setState({ createPopup: 0 }, this.props.scheduleApi)
+  // }
 
   editDateFormat = () => {
 
@@ -541,7 +541,7 @@ class ScheduleMeetinglist extends React.Component {
 
         {/* schedule meeting list */}
 
-        <div id="dvListScheduleMeeting" className="popBox" style={{ display: this.state.createPopup === 0 ? '' : 'none' }}>
+        <div id="dvListScheduleMeeting" className="popBox" style={{ display: this.props.createPopup === 0 ? '' : 'none' }}>
 
           <div className="popBoxInner">
             <div className="popBoxHeader" id="dvScheduleMeetingTitle">
@@ -675,7 +675,7 @@ class ScheduleMeetinglist extends React.Component {
               <button className="cancelButton" >
                 <span>close</span>
               </button>
-              <button onClick={this.newMeetingDialog}>
+              <button onClick={this.props.newMeetingDialog}>
                 <span>New Meeting</span>
               </button>
             </div>
@@ -691,7 +691,7 @@ class ScheduleMeetinglist extends React.Component {
         <div id="dvCreateNewMeeting" className="popBox"
 
           style={{
-            display: this.state.createPopup === 1 || this.state.editPopup === 1 ? 'block' : 'none'
+            display: this.props.createPopup === 1 || this.state.editPopup === 1 ? 'block' : 'none'
 
 
 
@@ -777,7 +777,7 @@ class ScheduleMeetinglist extends React.Component {
                       </td>
                     </tr>
 
-                    <tr id="createRoomTr" style={{ display: this.state.createPopup === 1 ? 'table-row' : 'none' }}>
+                    <tr id="createRoomTr" style={{ display: this.props.createPopup === 1 ? 'table-row' : 'none' }}>
                       <td>
                         <input type="text" maxLength="50" className="textBox" placeholder="Title of Meeting" id="txtMeetingTopic" onChange={this.handleMeetingTitle}></input>
                       </td>
@@ -808,12 +808,12 @@ class ScheduleMeetinglist extends React.Component {
                     <tr>
                       <td>
 
-                        <input type="text" className="textBox flatpickr-input" onChange={this.state.createPopup === 1 ? this.handleMeetingDate : this.editMeetingDateFun} placeholder={this.state.editPopup === 1 ? this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-") : "DD-MM-YYYY"} id="txtMeetingDate" style={{ color: 'black' }}></input>
+                        <input type="text" className="textBox flatpickr-input" onChange={this.props.createPopup === 1 ? this.handleMeetingDate : this.editMeetingDateFun} placeholder={this.state.editPopup === 1 ? this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-") : "DD-MM-YYYY"} id="txtMeetingDate" style={{ color: 'black' }}></input>
 
                       </td>
 
                       <td>
-                        <input type="text" className="textBox flatpickr-input" onChange={this.state.createPopup === 1 ? this.handleMeetingTime : this.editMeetingTimeFun} placeholder={this.state.editPopup === 1 ? this.state.editTime : "HH24:MM"} id="txtMeetingDate" style={{ color: 'black' }}
+                        <input type="text" className="textBox flatpickr-input" onChange={this.props.createPopup === 1 ? this.handleMeetingTime : this.editMeetingTimeFun} placeholder={this.state.editPopup === 1 ? this.state.editTime : "HH24:MM"} id="txtMeetingDate" style={{ color: 'black' }}
                         ></input>
 
 
@@ -828,7 +828,7 @@ class ScheduleMeetinglist extends React.Component {
                       </td>
 
                       <td valign="top">
-                        <div className="cstomFile" style={{ display: this.state.createPopup === 1 ? 'block' : 'none' }}>
+                        <div className="cstomFile" style={{ display: this.props.createPopup === 1 ? 'block' : 'none' }}>
                           <label for="file-input" className="custom-file-upload fileBtn">
                             <span>Click to Upload File</span>
                           </label>
@@ -852,9 +852,9 @@ class ScheduleMeetinglist extends React.Component {
 
 
             <div className="popBoxFooter">
-              <button className="cancelButton" onClick={this.newMeetingClose}>Close</button>
+              <button className="cancelButton" onClick={this.props.newMeetingClose}>Close</button>
 
-              <button id="butSave" onClick={this.createFunctionality} style={{ display: this.state.createPopup === 1 ? 'inline-block' : 'none' }}>
+              <button id="butSave" onClick={this.createFunctionality} style={{ display: this.props.createPopup === 1 ? 'inline-block' : 'none' }}>
                 <span >Save</span>
               </button>
 
@@ -1049,7 +1049,7 @@ class ScheduleMeetinglist extends React.Component {
 
                   {
 
-                    //  this.state.panelActionData.data.msg === "participants list fetched successfully" ?
+                  
 
                     this.state.panelActionDataMsg === "participants list fetched successfully" ?
 
@@ -1214,7 +1214,7 @@ class ScheduleMeetinglist extends React.Component {
             conferId={this.state.hidePanelistPopup === 0 ? this.state.panelConfrenceId : this.state.panelistDialog === 1 ? this.state.confId : ''}
             meetingRoomName={this.state.hidePanelistPopup === 0 ? this.state.panelRoomName : this.state.panelistDialog === 1 ? this.state.meetingRoomName : ''}
             scheduleApi={this.props.scheduleApi}
-
+            newMeetingClose={this.props.newMeetingClose}
           ></Panelist> : ''
         }
 

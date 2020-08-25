@@ -142,7 +142,7 @@ class Panelist extends React.Component {
 
         return (
             <>
-                <div className="dvAddPenalist" className="popBox" >
+                <div id="dvAddPenalist" className="popBox" >
                 {/* display: this.state.hidePanel === 0 ? 'block' : 'none' */}
 
                     <div className="popBoxInner">
@@ -221,7 +221,7 @@ class Panelist extends React.Component {
 
                         <div className="popBoxFooter">
                             <span id="spnCopyShare">
-                                <button className="cancelButton" onClick={this.props.scheduleApi} >
+                                <button className="cancelButton" onClick={this.props.newMeetingClose} >
                                     <span>close</span>
                                 </button>
 
