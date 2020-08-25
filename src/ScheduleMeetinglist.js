@@ -5,7 +5,13 @@ import Panelist from './Panelist';
 import DocumentList from './DocumentList';
 import RecordingList from './RecordingList';
 import ChatList from './ChatList';
-import HistoryList from './HistoryList.js';
+import HistoryList from './HistoryList';
+import ShareDetails from './ShareDetails';
+ 
+import "flatpickr/dist/themes/material_green.css";
+
+import Flatpickr from "react-flatpickr";
+import DeleteRoom from './DeleteRoom';
 
 class ScheduleMeetinglist extends React.Component {
 
@@ -13,11 +19,12 @@ class ScheduleMeetinglist extends React.Component {
     super(props)
     this.state = {
 
+      greetingString: '',
 
       editPopup: 0,
       // createPopup: 0,
       meetingTitle: '',
-      meetingDate: new Date(),
+      meetingDate: '',
       meetingPwd: 'Meeting Password',
       meetingRoomName: '',
       meetingTime: '',
@@ -40,7 +47,7 @@ class ScheduleMeetinglist extends React.Component {
       shareRoomName: '',
       sharePassword: '',
       shareTopic: '',
-
+      shareConId: '',
       shareTime: '',
       hidePanelistPopup: 1,
       hideDeletePopup: 1,
@@ -61,8 +68,9 @@ class ScheduleMeetinglist extends React.Component {
       documentPopup: 0,
       recordingpopup: 0,
       chatPopup: 0,
-      historyPopup: 0
+      historyPopup: 0,
 
+      // date: new Date()
 
     }
   }
@@ -160,10 +168,9 @@ class ScheduleMeetinglist extends React.Component {
   }
 
   handleSharePopup = (r) => {
-    console.log(r)
-    console.log(r.roomname)
-
-    this.setState({ sharePopup: 1, shareRoomName: r.roomname, shareTopic: r.topic, sharePassword: r.room_pass, shareTime: r.conferencescheduletime })
+  
+console.log(r)
+    this.setState({ sharePopup: 1, shareRoomName: r.roomname, shareTopic: r.topic, sharePassword: r.room_pass, shareTime: r.conferencescheduletime, shareConId: r.confrenceid })
   }
 
   handleMeetingTitle = (event) => {
@@ -178,7 +185,12 @@ class ScheduleMeetinglist extends React.Component {
   }
 
   handleMeetingDate = (event) => {
-    console.log(event.target.value)
+
+
+    // const { date } = this.state;
+    // var newDate = new Date(date.toDateString());
+    // console.log(newDate)
+    // this.setState({ meetingDate: newDate } , () => {console.log(this.state.meetingDate)});
     this.setState({ meetingDate: event.target.value });
   }
 
@@ -291,34 +303,6 @@ class ScheduleMeetinglist extends React.Component {
 
   }
 
-
-  deleteFunctionality = () => {
-
-    axios.post('https://api.videomeet.in/v2/conference.php/delete', qs.stringify({
-
-      authkey: 'M2atKiuCGKOo9Mj3',
-      confrenceid: this.state.parentResponse.confrenceid
-
-
-    }), {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      "Access-Control-Allow-Origin": "*",
-    }
-
-    )
-      .then((response) => {
-        console.log(response)
-        console.log(response.data.msg)
-        alert(response.data.msg)
-
-      },
-        (error) => {
-          console.log(error)
-        }
-      )
-
-
-  }
 
 
   editFunctionality = () => {
@@ -437,8 +421,29 @@ class ScheduleMeetinglist extends React.Component {
 
   createFunctionality = () => {
 
+//     var aday =  this.state.meetingDate
+// console.log(aday)
+//     var today = new Date(aday.toDateString());
+//     console.log(today)  
 
-    var a = this.state.meetingDate
+//     const { date } = this.state;
+//     var newDate = new Date(date.toDateString());
+//     console.log(newDate)
+
+// var sortedDate=today.getDate() + "-"+ parseInt(today.getMonth()+1) +"-"+today.getFullYear();
+
+// console.log(sortedDate)
+
+
+//it will accept dash values(meetingDate should be in 29-11-1993)
+
+     
+   
+  
+if(this.state.meetingTitle === "" || this.state.meetingDate === "" || this.state.meetingRoomName === "" || this.state.meetingTime === "" || this.state.meetingPwd === "Meeting Password"){
+  alert('All fields are mandatory')
+}
+else{
 
 
     var expDate = new Date(this.state.meetingDate.split("-")[2] + "," + this.state.meetingDate.split("-")[1] + "," + this.state.meetingDate.split("-")[0]);
@@ -504,7 +509,7 @@ class ScheduleMeetinglist extends React.Component {
         }
       )
 
-    // }
+    }
 
 
   }
@@ -528,12 +533,31 @@ class ScheduleMeetinglist extends React.Component {
   }
 
   componentDidMount() {
+
+    var current_time = new Date();
+    var hour = current_time.getHours();
+    var minute = current_time.getMinutes();
+  
+    
+    if((hour>=5 && minute>=0) && (hour<=11 && minute<=59)) {
+      this.setState({greetingString: 'Good Morning!'})
+     
+    } else if((hour>=12 && minute>=0) && (hour<=16 && minute<=59)) {
+      this.setState({greetingString: 'Good Afternoon!'})
+  
+    } else {
+      this.setState({greetingString: 'Good Evening!'})
+    }
+
     this.props.scheduleApi()
   }
 
   render() {
+
+    const { meetingDate } = this.state;
+
     var logoutImg = 'https://bridge01.videomeet.in/images/logout-username.png';
-    var copyIcon = "https://bridge01.videomeet.in/images/copy.jpg";
+   
 
 
     return (
@@ -541,7 +565,9 @@ class ScheduleMeetinglist extends React.Component {
 
         {/* schedule meeting list */}
 
-        <div id="dvListScheduleMeeting" className="popBox" style={{ display: this.props.createPopup === 0 ? '' : 'none' }}>
+        <div id="dvListScheduleMeeting" className="popBox" style={{
+          
+          display: this.props.createPopup === 0 && this.props.parentData !== ''? '' : 'none' }}>
 
           <div className="popBoxInner">
             <div className="popBoxHeader" id="dvScheduleMeetingTitle">
@@ -594,7 +620,18 @@ class ScheduleMeetinglist extends React.Component {
 
                       this.props.dataSource.map((res, k) => {
                         var j = Object.values(res)
+                     
+                        if (res['mode'] === "1") {
+                          var conMode = "Conference"
+                        }
 
+                        else if (res['mode'] === "2") {
+                          var conMode = "Webinar"
+                        }
+
+                        else {
+                          var conMode = "Sensitive"
+                        }
 
                         var lock = "https://bridge01.videomeet.in/images/lock.png"
                         var videoIcon = "https://bridge01.videomeet.in/images/cameraIconBlue.png"
@@ -614,7 +651,7 @@ class ScheduleMeetinglist extends React.Component {
                               </td>
                               <td>{res['topic']}</td>
                               <td>
-                                <span>{'Sensitive'}</span>
+                                <span>{conMode}</span>
                               </td>
                               <td>{res['conferencescheduletime']}</td>
 
@@ -672,9 +709,10 @@ class ScheduleMeetinglist extends React.Component {
             </div>
 
             <div className="popBoxFooter">
+              <a href="">
               <button className="cancelButton" >
                 <span>close</span>
-              </button>
+              </button></a>
               <button onClick={this.props.newMeetingDialog}>
                 <span>New Meeting</span>
               </button>
@@ -699,7 +737,7 @@ class ScheduleMeetinglist extends React.Component {
           <div className="popBoxInner">
             <div className="popBoxHeader" id="dvSetTitle">
               <h5>
-                <span>Good Afternoon! </span>
+                <span>{this.state.greetingString} </span>
                 {this.props.uname}
               </h5>
             </div>
@@ -808,13 +846,47 @@ class ScheduleMeetinglist extends React.Component {
                     <tr>
                       <td>
 
-                        <input type="text" className="textBox flatpickr-input" onChange={this.props.createPopup === 1 ? this.handleMeetingDate : this.editMeetingDateFun} placeholder={this.state.editPopup === 1 ? this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-") : "DD-MM-YYYY"} id="txtMeetingDate" style={{ color: 'black' }}></input>
+{/*                         
+                        <Flatpickr data-enable-time
+                          options={{
+                            dateFormat: 'd-m-Y',
 
+                            clickOpens: true,
+                            defaultDate: null,
+                            defaultHour: 12,
+                            defaultMinute: 0,
+                            minDate: null,
+                            maxDate: null,
+                            enableTime: false,
+                            enableSeconds: false,
+                            time_24hr: false,
+                            noCalendar: false
+
+                          }} */}
+
+                          {/* value={meetingDate} */}
+
+                          {/* onChange={meetingDate => {
+                            this.setState({ meetingDate },() => {console.log(this.state.meetingDate)});
+                          }}
+
+                       placeholder={this.state.editPopup === 1 ? this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-") : "DD-MM-YYYY"}
+                    
+                      //  onChange={this.props.createPopup === 1 ? this.handleMeetingDate : this.editMeetingDateFun}
+                        > */}
+
+                      <input type="text"   className="textBox flatpickr-input" id="txtMeetingDate" style={{ color: 'black' }} 
+                      onChange={this.props.createPopup === 1 ? this.handleMeetingDate : this.editMeetingDateFun} placeholder={this.state.editPopup === 1 ? this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-") : "DD-MM-YYYY"} id="txtMeetingDate" style={{ color: 'black' }}></input> 
+                     
                       </td>
 
                       <td>
+                    
+         
+    
                         <input type="text" className="textBox flatpickr-input" onChange={this.props.createPopup === 1 ? this.handleMeetingTime : this.editMeetingTimeFun} placeholder={this.state.editPopup === 1 ? this.state.editTime : "HH24:MM"} id="txtMeetingDate" style={{ color: 'black' }}
                         ></input>
+                       
 
 
 
@@ -870,137 +942,35 @@ class ScheduleMeetinglist extends React.Component {
         {/* share action */}
 
         <div id="dvShareScheduleDetail" className="popBox" style={{ display: this.state.sharePopup === 1 ? 'block' : 'none' }}>
-          <div className="popBoxInner">
-            <div className="popBoxHeader">
-              <h5>
-                <span>Copy and Share to Invite</span>
-              </h5>
-            </div>
+         
+        <ShareDetails
 
-            <div className="popBoxBody" id="dvShareDetailBody">
-              <h5>
-                <span>
-                  <strong> {this.props.bc}  is inviting you to a scheduled VideoMeet.</strong>
-                </span>
-              </h5>
-
-
-              <h6>
-                <u><span>Topic</span>{": "}{this.state.shareTopic}</u>
-              </h6>
-
-              <p>
-                <strong>
-                  <span>Time</span>{": "}{this.state.shareTime}
-                </strong>
-
-                <br>
-                </br>
-
-                <strong>
-                  <span>Host</span>{": "}{this.props.bc}
-                </strong>
-              </p>
-
-
-              <h6>
-                <u>
-                  <span>Joining Details</span>
-                </u>
-              </h6>
-
-              <p>
-                <strong>Meeting Room Name</strong>{": "}{this.state.shareRoomName}
-                <br></br>
-
-                <strong>Meeting Room Password</strong>{this.state.sharePassword}
-
-
-              </p>
-
-
-              <h6>
-                <u>
-                  <span>Join VideoMeet</span>
-                </u>
-
-              </h6>
-
-              <a href="https://bridge01.videomeet.in/" className="upMove" target="_blank">https:/bridge01.videomeet.in</a>
-
-              <img src={copyIcon} title="Click to copy" style={{ right: -545, position: "relative", top: 73, cursor: 'pointer' }} />
-
-            </div>
-
-            <div className="popBoxFooter">
-              <button className="cancelButton" onClick={this.sharePopupClose} >
-                <span>Close</span>
-              </button>
-
-              <span id="spnSendMailToShare">
-
-                <button className="btnMail">
-                  <span>  Send Mail With Password</span>
-                </button>
-
-                <button className="btnMail">
-                  <span>  Send Mail Without Password</span>
-                </button>
-
-                <button className="btnMail">
-                  <span>  Send Password</span>
-                </button>
-
-
-
-              </span>
-
-            </div>
-          </div>
+        bc={this.props.bc}
+        uname={this.props.uname}
+        shareConId={this.state.shareConId}
+        shareRoomName={this.state.shareRoomName}
+        sharePassword={this.state.sharePassword}
+        shareTopic={this.state.shareTopic}
+        shareTime={this.state.shareTime}
+        sharePopupClose={this.sharePopupClose}
+      
+        ></ShareDetails>
 
         </div>
 
         {/* delete action */}
 
         <div id="dvDeleteMessage" className="popBox" style={{ display: this.state.hideDeletePopup === 0 ? 'block' : 'none' }}>
-          <div className="popBoxInner">
-            <div className="popBoxHeader" id="dvDeleteMessageTitle">
-              <h5>
-                <span>Confirm Delete</span>
-              </h5>
-            </div>
+         
+          <DeleteRoom
 
-            <div className="popBoxBody relativeDiv">
-              <span className="relativeDivBlock" id="spnDeleteMessageBody">
-                <span>
-                  <h6>Following will be deleted from the Room - {this.state.deleteRoomName}.</h6>
-          1. Document
-          <br></br>
-          2. Recording
-          <br></br>
-          3. Participant / Panelist
-          <br></br>
-          4. Chat
-          <br></br>
-          5. History
+            deleteRoomName={this.state.deleteRoomName}
+            parentResponse={this.state.parentResponse}
+            deletePopupClose={this.deletePopupClose}
+            scheduleApi={this.props.scheduleApi}
 
-        </span>
-              </span>
+          ></DeleteRoom>
 
-            </div>
-
-            <div className="popBoxFooter">
-              <button className="cancelButton" onClick={this.deletePopupClose} >
-                <span>Close</span>
-              </button>
-
-              <span id="spnDeleteMessageBut"></span>
-              <button onClick={this.deleteFunctionality}>
-                <span>Yes, Delete</span>
-              </button>
-            </div>
-
-          </div>
         </div>
 
 

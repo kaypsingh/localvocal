@@ -26,6 +26,15 @@ class Panelist extends React.Component {
       
 // this.setState({clickedSave: 1})
 
+
+
+
+if(this.state.participantName === "" || this.state.participantEmail === "" || this.state.participantCode === "Click to generate code"){
+    alert('All fields are mandatory')
+}
+
+else{
+
         if (this.state.ishost === false) {
             var addPar = "0"
 
@@ -67,7 +76,7 @@ class Panelist extends React.Component {
                     console.log(error)
                 }
             )
-
+            }
 
     }
 
@@ -171,7 +180,7 @@ class Panelist extends React.Component {
                                     <tr>
                                         <td>
                                             <label>
-                                                <span>Email Address {":"}</span>
+                                                <span>Email Address :</span>
                                             </label>
                                         </td>
 

@@ -27,7 +27,7 @@ class App extends React.Component {
      
       login: 0,
       dataSource: [],
-      parentData: {},
+      parentData: '',
       dataEntry: '',
       scheduleListDisplay: 0
     }
@@ -127,7 +127,7 @@ class App extends React.Component {
 
   scheduleApi = () => {
 
-
+console.log('ji')
     this.setState({ createPopup: 0 })
     axios.post('https://api.videomeet.in/v2/conference.php/confrencelist', qs.stringify({
 
@@ -146,7 +146,7 @@ class App extends React.Component {
         console.log(response.data.msg)
 
         if (response.data.msg === "No record found") {
-          this.setState({ dataEntry: 'No record found' })
+          this.setState({ dataEntry: 'No record found', parentData: "No record found" })
         }
 
         else if (response.data.msg === "conference list fetched successfully") {
@@ -168,7 +168,13 @@ class App extends React.Component {
 
   handleUnameChange = (event) => {
 
+    // var a = event.target.value
+    // if(a.match(/^[a-zA-Z ]*$/)){
+
+    //   alert('invalid')}else{
+
     this.setState({ username: event.target.value });
+      // }
   }
 
   loginSuccessful = () => {
