@@ -39,15 +39,21 @@ class App extends React.Component {
   }
 
   newMeetingClose = () => {
+ 
+    console.log('hanji')
     this.setState({ createPopup: 0 })
     // , this.scheduleApi
+  }
+
+  onSaveAddMeating = () => {
+    console.log('clickedddddddddddd')
+    this.setState({ createPopup: 1 })
   }
   
   handlePwdChange = (event) => {
     this.setState({ password: event.target.value });
   }
 
-  
 
 
   handleLogin = () => {
@@ -274,6 +280,8 @@ console.log('ji')
           newMeetingDialog={this.newMeetingDialog}
           newMeetingClose={this.newMeetingClose}
           createPopup={this.state.createPopup}
+          onSaveAddMeating={this.onSaveAddMeating}
+
         ></LoginMeeting>
 
     )

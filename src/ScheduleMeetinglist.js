@@ -7,11 +7,14 @@ import RecordingList from './RecordingList';
 import ChatList from './ChatList';
 import HistoryList from './HistoryList';
 import ShareDetails from './ShareDetails';
- 
+
 import "flatpickr/dist/themes/material_green.css";
 
 import Flatpickr from "react-flatpickr";
 import DeleteRoom from './DeleteRoom';
+import UploadDocument from './UploadDocument';
+import UploadLogo from './UploadLogo';
+import UploadBackground from './UploadBackground';
 
 class ScheduleMeetinglist extends React.Component {
 
@@ -70,9 +73,96 @@ class ScheduleMeetinglist extends React.Component {
       chatPopup: 0,
       historyPopup: 0,
 
+      clickPanelIcon: 0,
+      quickPwd: '',
+      roomPwdUpdateMsg: '',
+
+      uploadDocPopup: 0,
+
+      uploadLogoPopup: 0,
+
+      uploadBackgroundPopup: 0
       // date: new Date()
 
     }
+  }
+
+
+
+
+  uploadDoc = () => {
+    this.setState({ uploadDocPopup: 1, panelistActionPopup: 0 })
+  }
+
+  uploadLogo = () => {
+    this.setState({ uploadLogoPopup: 1, panelistActionPopup: 0, documentPopup: 0 })
+  }
+
+  uploadBackground = () => {
+    this.setState({ uploadBackgroundPopup: 1, panelistActionPopup: 0, documentPopup: 0 })
+  }
+
+  closeUploadDoc = () => {
+    this.setState({ uploadDocPopup: 0, documentPopup: 1 })
+  }
+
+  closeUploadLogo = () => {
+    this.setState({ uploadLogoPopup: 0, documentPopup: 1 })
+  }
+
+  closeUploadBackground = () => {
+    this.setState({ uploadBackgroundPopup: 0, documentPopup: 1 })
+  }
+
+  quickUpdatePwd = (event) => {
+    console.log(event.target.value)
+    this.setState({ quickPwd: event.target.value })
+
+  }
+
+
+  quickPwdLogic = () => {
+
+    axios.post('https://api.videomeet.in/v2/conference.php/roompassupdate', qs.stringify({
+
+      authkey: 'M2atKiuCGKOo9Mj3',
+      roomname: this.state.panelActionRoomname,
+      room_pass: this.state.quickPwd
+
+    }), {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      "Access-Control-Allow-Origin": "*",
+    }
+
+    )
+      .then((response) => {
+
+        console.log(response)
+
+        alert(response.data.msg)
+
+        this.setState({ roomPwdUpdateMsg: "room pass update successfully." })
+
+      },
+        (error) => {
+          console.log(error)
+        }
+      )
+
+
+
+
+
+  }
+
+  closeEditMeeting = () => {
+    this.setState({ editPopup: 0 })
+  }
+
+  closePanel = () => {
+
+
+    this.setState({ panelistDialog: 0, hidePanelistPopup: 1 })
   }
 
 
@@ -91,7 +181,7 @@ class ScheduleMeetinglist extends React.Component {
   }
 
   closeListofDocuments = () => {
-    this.setState({ documentPopup: 0 })
+    this.setState({ documentPopup: 0, panelistActionPopup: 1 })
 
   }
 
@@ -112,14 +202,19 @@ class ScheduleMeetinglist extends React.Component {
   }
 
   myHistory = () => {
-    this.setState({ historyPopup: 1})
+    this.setState({ historyPopup: 1 })
   }
 
   closeMyHistory = () => {
-    this.setState({ historyPopup: 0})
+    this.setState({ historyPopup: 0 })
+  }
+
+  roomActionClose = () => {
+    this.setState({ panelistActionPopup: 0 })
   }
 
   listPanelistAction = (r) => {
+    console.log(r)
     this.setState({ panelistActionPopup: 1, panelActionRoomname: r.roomname, panelActionPwd: r.room_pass })
 
 
@@ -158,7 +253,7 @@ class ScheduleMeetinglist extends React.Component {
   handlePanelistPopup = (r) => {
     console.log(r.confrenceid)
 
-    this.setState({ hidePanelistPopup: 0, panelConfrenceId: r.confrenceid, panelRoomName: r.roomname })
+    this.setState({ hidePanelistPopup: 0, panelConfrenceId: r.confrenceid, panelRoomName: r.roomname, clickPanelIcon: 1 })
   }
 
   handleDeletePopup = (r) => {
@@ -168,8 +263,8 @@ class ScheduleMeetinglist extends React.Component {
   }
 
   handleSharePopup = (r) => {
-  
-console.log(r)
+
+    console.log(r)
     this.setState({ sharePopup: 1, shareRoomName: r.roomname, shareTopic: r.topic, sharePassword: r.room_pass, shareTime: r.conferencescheduletime, shareConId: r.confrenceid })
   }
 
@@ -398,6 +493,7 @@ console.log(r)
 
     )
       .then((response) => {
+        this.setState({ editPopup: 0 }, () => this.props.scheduleApi())
         console.log(response)
         alert(response.data.msg)
 
@@ -418,96 +514,95 @@ console.log(r)
 
 
 
-
   createFunctionality = () => {
 
-//     var aday =  this.state.meetingDate
-// console.log(aday)
-//     var today = new Date(aday.toDateString());
-//     console.log(today)  
+    //     var aday =  this.state.meetingDate
+    // console.log(aday)
+    //     var today = new Date(aday.toDateString());
+    //     console.log(today)  
 
-//     const { date } = this.state;
-//     var newDate = new Date(date.toDateString());
-//     console.log(newDate)
+    //     const { date } = this.state;
+    //     var newDate = new Date(date.toDateString());
+    //     console.log(newDate)
 
-// var sortedDate=today.getDate() + "-"+ parseInt(today.getMonth()+1) +"-"+today.getFullYear();
+    // var sortedDate=today.getDate() + "-"+ parseInt(today.getMonth()+1) +"-"+today.getFullYear();
 
-// console.log(sortedDate)
-
-
-//it will accept dash values(meetingDate should be in 29-11-1993)
-
-     
-   
-  
-if(this.state.meetingTitle === "" || this.state.meetingDate === "" || this.state.meetingRoomName === "" || this.state.meetingTime === "" || this.state.meetingPwd === "Meeting Password"){
-  alert('All fields are mandatory')
-}
-else{
+    // console.log(sortedDate)
 
 
-    var expDate = new Date(this.state.meetingDate.split("-")[2] + "," + this.state.meetingDate.split("-")[1] + "," + this.state.meetingDate.split("-")[0]);
-    var expDate = new Date(expDate.getTime() + (7 * 24 * 60 * 60 * 1000));
-    var expiryMonth = expDate.getMonth() + 1;
-    if ((expDate.getMonth() + 1) < 10)
-      expiryMonth = "0" + (expDate.getMonth() + 1);
-    var expiryDay = expDate.getDate()
-    if (expDate.getDate() < 10)
-      expiryDay = "0" + expDate.getDate();
-    var conferenceexpirationtime = expDate.getFullYear() + "-" + expiryMonth + "-" + expiryDay + " " + this.state.meetingTime;
+    //it will accept dash values(meetingDate should be in 29-11-1993)
 
-    if (this.state.waitingRoom === "false") {
-      var roomEnable = "0"
+
+
+
+    if (this.state.meetingTitle === "" || this.state.meetingDate === "" || this.state.meetingRoomName === "" || this.state.meetingTime === "" || this.state.meetingPwd === "Meeting Password") {
+      alert('All fields are mandatory')
     }
     else {
-      var roomEnable = "1"
-    }
-
-    axios.post('https://api.videomeet.in/v2/conference.php/add', qs.stringify({
-
-      authkey: 'M2atKiuCGKOo9Mj3',
-      username: this.props.uname,
-      conferencescheduletime: this.state.meetingDate.split("-")[2] + "-" + this.state.meetingDate.split("-")[1] + "-" + this.state.meetingDate.split("-")[0] + " " + this.state.meetingTime,
-      topic: this.state.meetingTitle,
-      // roomname: "mummy",
-      roomname: this.state.meetingRoomName.toLowerCase(),
-      req_origin: "web",
-      conferenceexpirationtime: conferenceexpirationtime,
-      mode: "1",
-      room_pass: this.state.meetingPwd,
-      waitingroomenable: roomEnable
 
 
-    }), {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      "Access-Control-Allow-Origin": "*",
-    }
+      var expDate = new Date(this.state.meetingDate.split("-")[2] + "," + this.state.meetingDate.split("-")[1] + "," + this.state.meetingDate.split("-")[0]);
+      var expDate = new Date(expDate.getTime() + (7 * 24 * 60 * 60 * 1000));
+      var expiryMonth = expDate.getMonth() + 1;
+      if ((expDate.getMonth() + 1) < 10)
+        expiryMonth = "0" + (expDate.getMonth() + 1);
+      var expiryDay = expDate.getDate()
+      if (expDate.getDate() < 10)
+        expiryDay = "0" + expDate.getDate();
+      var conferenceexpirationtime = expDate.getFullYear() + "-" + expiryMonth + "-" + expiryDay + " " + this.state.meetingTime;
 
-    )
-      .then((response) => {
-        console.log(response)
-        alert(response.data.msg)
+      if (this.state.waitingRoom === "false") {
+        var roomEnable = "0"
+      }
+      else {
+        var roomEnable = "1"
+      }
 
-        this.setState({ confId: response.data.data.confrenceid }, () => {
+      axios.post('https://api.videomeet.in/v2/conference.php/add', qs.stringify({
 
-          console.log(this.state.confId)
-          if (response.data.msg === "conference scheduled successfully") {
+        authkey: 'M2atKiuCGKOo9Mj3',
+        username: this.props.uname,
+        conferencescheduletime: this.state.meetingDate.split("-")[2] + "-" + this.state.meetingDate.split("-")[1] + "-" + this.state.meetingDate.split("-")[0] + " " + this.state.meetingTime,
+        topic: this.state.meetingTitle,
+        // roomname: "mummy",
+        roomname: this.state.meetingRoomName.toLowerCase(),
+        req_origin: "web",
+        conferenceexpirationtime: conferenceexpirationtime,
+        mode: "1",
+        room_pass: this.state.meetingPwd,
+        waitingroomenable: roomEnable
 
 
-            console.log('kooo')
-            //do something here
-            this.setState({ panelistDialog: 1 })
-          }
-        })
+      }), {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        "Access-Control-Allow-Origin": "*",
+      }
 
-
-
-
-      },
-        (error) => {
-          console.log(error)
-        }
       )
+        .then((response) => {
+          console.log(response)
+          alert(response.data.msg)
+
+          this.setState({ confId: response.data.data.confrenceid }, () => {
+
+            console.log(this.state.confId)
+            if (response.data.msg === "conference scheduled successfully") {
+
+
+              console.log('kooo')
+              //do something here
+              this.setState({ panelistDialog: 1 })
+            }
+          })
+
+
+
+
+        },
+          (error) => {
+            console.log(error)
+          }
+        )
 
     }
 
@@ -537,16 +632,16 @@ else{
     var current_time = new Date();
     var hour = current_time.getHours();
     var minute = current_time.getMinutes();
-  
-    
-    if((hour>=5 && minute>=0) && (hour<=11 && minute<=59)) {
-      this.setState({greetingString: 'Good Morning!'})
-     
-    } else if((hour>=12 && minute>=0) && (hour<=16 && minute<=59)) {
-      this.setState({greetingString: 'Good Afternoon!'})
-  
+
+
+    if ((hour >= 5 && minute >= 0) && (hour <= 11 && minute <= 59)) {
+      this.setState({ greetingString: 'Good Morning!' })
+
+    } else if ((hour >= 12 && minute >= 0) && (hour <= 16 && minute <= 59)) {
+      this.setState({ greetingString: 'Good Afternoon!' })
+
     } else {
-      this.setState({greetingString: 'Good Evening!'})
+      this.setState({ greetingString: 'Good Evening!' })
     }
 
     this.props.scheduleApi()
@@ -557,7 +652,8 @@ else{
     const { meetingDate } = this.state;
 
     var logoutImg = 'https://bridge01.videomeet.in/images/logout-username.png';
-   
+    var updateImg = "https://bridge01.videomeet.in/images/update.png"
+
 
 
     return (
@@ -566,8 +662,9 @@ else{
         {/* schedule meeting list */}
 
         <div id="dvListScheduleMeeting" className="popBox" style={{
-          
-          display: this.props.createPopup === 0 && this.props.parentData !== ''? '' : 'none' }}>
+
+          display: this.props.createPopup === 0 && this.props.parentData !== '' ? '' : 'none'
+        }}>
 
           <div className="popBoxInner">
             <div className="popBoxHeader" id="dvScheduleMeetingTitle">
@@ -581,7 +678,7 @@ else{
 
             </div>
 
-            <div className="popBoxBody" id="dvListScheduleMeetingTable" style={{ overflowY: 'auto' }} >
+            <div className="popBoxBody" id="dvListScheduleMeetingTable" style={{ overflowY: 'auto', maxHeight: 369 }} >
 
               <table className="tableBox" id="tblListScheduleMeeting" style={{ "width": "100%" }}>
                 <tbody>
@@ -620,7 +717,7 @@ else{
 
                       this.props.dataSource.map((res, k) => {
                         var j = Object.values(res)
-                     
+
                         if (res['mode'] === "1") {
                           var conMode = "Conference"
                         }
@@ -657,12 +754,12 @@ else{
 
                               <td style={{ textAlign: 'center' }}>
 
-                                <img src={panelistIcon} onClick={() => { this.handlePanelistPopup(res) }} className="image-size-set" alt title="Panelist" />
+                                <img src={panelistIcon} onClick={() => { this.handlePanelistPopup(res); this.props.newMeetingDialog() }} className="image-size-set" alt title="Panelist" />
 
 
                                 <span className="spn-pipe-position">{"  "}</span>
 
-                                <img src={roomIcon} onClick={() => { this.listPanelistAction(res) }} className="image-size-set" alt title="Room" />
+                                <img src={roomIcon} onClick={() => { this.listPanelistAction(res); this.props.newMeetingDialog() }} className="image-size-set" alt title="Room" />
 
 
                               </td>
@@ -710,9 +807,9 @@ else{
 
             <div className="popBoxFooter">
               <a href="">
-              <button className="cancelButton" >
-                <span>close</span>
-              </button></a>
+                <button className="cancelButton" >
+                  <span>close</span>
+                </button></a>
               <button onClick={this.props.newMeetingDialog}>
                 <span>New Meeting</span>
               </button>
@@ -846,7 +943,7 @@ else{
                     <tr>
                       <td>
 
-{/*                         
+                        {/*                         
                         <Flatpickr data-enable-time
                           options={{
                             dateFormat: 'd-m-Y',
@@ -864,9 +961,9 @@ else{
 
                           }} */}
 
-                          {/* value={meetingDate} */}
+                        {/* value={meetingDate} */}
 
-                          {/* onChange={meetingDate => {
+                        {/* onChange={meetingDate => {
                             this.setState({ meetingDate },() => {console.log(this.state.meetingDate)});
                           }}
 
@@ -875,18 +972,18 @@ else{
                       //  onChange={this.props.createPopup === 1 ? this.handleMeetingDate : this.editMeetingDateFun}
                         > */}
 
-                      <input type="text"   className="textBox flatpickr-input" id="txtMeetingDate" style={{ color: 'black' }} 
-                      onChange={this.props.createPopup === 1 ? this.handleMeetingDate : this.editMeetingDateFun} placeholder={this.state.editPopup === 1 ? this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-") : "DD-MM-YYYY"} id="txtMeetingDate" style={{ color: 'black' }}></input> 
-                     
+                        <input type="text" className="textBox flatpickr-input" id="txtMeetingDate" style={{ color: 'black' }}
+                          onChange={this.props.createPopup === 1 ? this.handleMeetingDate : this.editMeetingDateFun} placeholder={this.state.editPopup === 1 ? this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-") : "DD-MM-YYYY"} id="txtMeetingDate" style={{ color: 'black' }}></input>
+
                       </td>
 
                       <td>
-                    
-         
-    
+
+
+
                         <input type="text" className="textBox flatpickr-input" onChange={this.props.createPopup === 1 ? this.handleMeetingTime : this.editMeetingTimeFun} placeholder={this.state.editPopup === 1 ? this.state.editTime : "HH24:MM"} id="txtMeetingDate" style={{ color: 'black' }}
                         ></input>
-                       
+
 
 
 
@@ -924,13 +1021,13 @@ else{
 
 
             <div className="popBoxFooter">
-              <button className="cancelButton" onClick={this.props.newMeetingClose}>Close</button>
+              <button className="cancelButton" onClick={() => { this.props.newMeetingClose(); this.closeEditMeeting() }}>Close</button>
 
-              <button id="butSave" onClick={this.createFunctionality} style={{ display: this.props.createPopup === 1 ? 'inline-block' : 'none' }}>
+              <button id="butSave" onClick={() => { this.createFunctionality(); this.props.onSaveAddMeating() }} style={{ display: this.props.createPopup === 1 ? 'inline-block' : 'none' }}>
                 <span >Save</span>
               </button>
 
-              <button id="butEdit" onClick={this.editFunctionality} style={{ display: this.state.editPopup === 1 ? 'inline-block' : 'none' }}>
+              <button id="butEdit" onClick={() => { this.editFunctionality() }} style={{ display: this.state.editPopup === 1 ? 'inline-block' : 'none' }}>
 
                 <span >Save</span>
               </button>
@@ -942,26 +1039,26 @@ else{
         {/* share action */}
 
         <div id="dvShareScheduleDetail" className="popBox" style={{ display: this.state.sharePopup === 1 ? 'block' : 'none' }}>
-         
-        <ShareDetails
 
-        bc={this.props.bc}
-        uname={this.props.uname}
-        shareConId={this.state.shareConId}
-        shareRoomName={this.state.shareRoomName}
-        sharePassword={this.state.sharePassword}
-        shareTopic={this.state.shareTopic}
-        shareTime={this.state.shareTime}
-        sharePopupClose={this.sharePopupClose}
-      
-        ></ShareDetails>
+          <ShareDetails
+
+            bc={this.props.bc}
+            uname={this.props.uname}
+            shareConId={this.state.shareConId}
+            shareRoomName={this.state.shareRoomName}
+            sharePassword={this.state.sharePassword}
+            shareTopic={this.state.shareTopic}
+            shareTime={this.state.shareTime}
+            sharePopupClose={this.sharePopupClose}
+
+          ></ShareDetails>
 
         </div>
 
         {/* delete action */}
 
         <div id="dvDeleteMessage" className="popBox" style={{ display: this.state.hideDeletePopup === 0 ? 'block' : 'none' }}>
-         
+
           <DeleteRoom
 
             deleteRoomName={this.state.deleteRoomName}
@@ -983,7 +1080,25 @@ else{
 
               <span style={{ float: "right", position: "relative", top: -25 }}>
                 <h5>
-                  <span>Password : {this.state.panelActionPwd}</span>
+                  <span>Password:</span>
+                  <span id="spnEditRoomPassword">{
+
+                    this.state.roomPwdUpdateMsg !== "room pass update successfully." ?
+
+                      <>
+
+                        <input type="text" className="textBox" onChange={this.quickUpdatePwd} id="txtEditRoomPassword" placeholder="Room Password" ></input>
+
+
+                        <img src={updateImg} onClick={this.quickPwdLogic} className="btnUpdate" />
+                      </>
+
+                      : this.state.quickPwd
+
+
+
+                  }
+                  </span>
                 </h5>
               </span>
             </div>
@@ -1019,7 +1134,7 @@ else{
 
                   {
 
-                  
+
 
                     this.state.panelActionDataMsg === "participants list fetched successfully" ?
 
@@ -1100,7 +1215,7 @@ else{
             </div>
 
             <div className="popBoxFooter">
-              <button className="cancelButton" >
+              <button className="cancelButton" onClick={() => { this.roomActionClose(); this.props.scheduleApi() }} >
                 <span>Close</span>
               </button>
 
@@ -1130,14 +1245,45 @@ else{
         </div>
 
 
+        <div id="dvAddDocment" className="popBox" style={{ display: this.state.uploadDocPopup === 1 ? 'block' : 'none' }}>
+
+          <UploadDocument
+            closeUploadDoc={this.closeUploadDoc}
+
+          ></UploadDocument>
+
+        </div>
+
+        <div id="dvAddDocumentLogo" className="popBox" style={{ display: this.state.uploadLogoPopup === 1 ? 'block' : 'none' }} >
+          <UploadLogo
+            closeUploadLogo={this.closeUploadLogo}
+          ></UploadLogo>
+        </div>
+
+        <div id="dvBackgroundImage" className="popBox" style={{display: this.state.uploadBackgroundPopup === 1 ? 'block' : 'none'}}>
+          <UploadBackground
+            closeUploadBackground={this.closeUploadBackground}
+        ></UploadBackground>
+
+        </div>
+
+
         {
 
           this.state.documentPopup === 1 ?
 
             <DocumentList
-            closeListofDocuments = {this.closeListofDocuments}
-            panelActionRoomname = {this.state.panelActionRoomname}
-            panelUsername = {this.props.username}
+              closeListofDocuments={this.closeListofDocuments}
+              panelActionRoomname={this.state.panelActionRoomname}
+              panelUsername={this.props.username}
+              uploadDoc={this.uploadDoc}
+              uploadLogo={this.uploadLogo}
+              uploadBackground={this.uploadBackground}
+              listPanelistAction={this.listPanelistAction}
+              closeUploadDoc={this.closeUploadDoc}
+              closeUploadLogo={this.closeUploadLogo}
+              closeUploadBackground={this.closeUploadBackground}
+
             ></DocumentList>
 
 
@@ -1147,11 +1293,11 @@ else{
         {
           this.state.recordingpopup === 1 ?
 
-          <RecordingList
-          closeMyRecordings = {this.closeMyRecordings}
-          recordingActionRoomname = {this.state.panelActionRoomname}
-          recordingUsername = {this.props.username}
-          ></RecordingList> : ''
+            <RecordingList
+              closeMyRecordings={this.closeMyRecordings}
+              recordingActionRoomname={this.state.panelActionRoomname}
+              recordingUsername={this.props.username}
+            ></RecordingList> : ''
         }
 
 
@@ -1159,20 +1305,22 @@ else{
         {
           this.state.chatPopup === 1 ?
 
-          <ChatList
-          closeMyChats = {this.closeMyChats}
-          chatActionRoomname = {this.state.panelActionRoomname}
-          ></ChatList> : ''
+            <ChatList
+              closeMyChats={this.closeMyChats}
+              chatActionRoomname={this.state.panelActionRoomname}
+            ></ChatList> : ''
         }
 
 
-{
+        {
           this.state.historyPopup === 1 ?
 
-          <HistoryList
-          closeMyHistory = {this.closeMyHistory}
-          historyActionRoomname = {this.state.panelActionRoomname}
-          ></HistoryList> : ''
+            <HistoryList
+
+              closeMyHistory={this.closeMyHistory}
+              historyActionRoomname={this.state.panelActionRoomname}
+
+            ></HistoryList> : ''
         }
 
 
@@ -1185,6 +1333,11 @@ else{
             meetingRoomName={this.state.hidePanelistPopup === 0 ? this.state.panelRoomName : this.state.panelistDialog === 1 ? this.state.meetingRoomName : ''}
             scheduleApi={this.props.scheduleApi}
             newMeetingClose={this.props.newMeetingClose}
+            onSaveAddMeating={this.props.onSaveAddMeating}
+            closePanel={this.closePanel}
+            clickPanelIcon={this.state.clickPanelIcon}
+            newMeetingDialog={this.props.newMeetingDialog}
+
           ></Panelist> : ''
         }
 

@@ -153,7 +153,7 @@ class ShareDetails extends React.Component {
                             <strong>Meeting Room Name</strong>{": "}{this.props.shareRoomName}
                             <br></br>
 
-                            <strong>Meeting Room Password</strong>{this.props.sharePassword}
+                            <strong>Meeting Room Password</strong>{": "}{this.props.sharePassword}
 
 
                         </p>

@@ -14,7 +14,7 @@ class DocumentList extends React.Component {
     }
 
   
-
+  
 
    
     fetchDocumentResult = () => {
@@ -34,7 +34,7 @@ class DocumentList extends React.Component {
 
                 console.log(response)
             
-                alert(response.data.msg)
+                // alert(response.data.msg)
 
                 // this.setState({documentMessage: response.data.msg})
 
@@ -71,17 +71,16 @@ class DocumentList extends React.Component {
                               <span>Upload {" "}</span>
                          
 
-                          <a href="">
-                              <span>Document {" | "}</span>
-                          </a>
+                       
+                              <span onClick={() => {this.props.closeListofDocuments(); this.props.uploadDoc()}} style={{color: '#3572b0'}}>Document {" | "}</span>
+                        
 
-                          <a href="">
-                              <span>Logo {" | "}</span>
-                          </a>
+                        
+                              <span onClick={this.props.uploadLogo} style={{color: '#3572b0'}}>Logo {" | "}</span>
+                          
 
-                          <a href="">
-                              <span>Background</span>
-                          </a>
+                              <span onClick={this.props.uploadBackground} style={{color: '#3572b0'}}>Background</span>
+                         
 
                           </span>
 
@@ -120,7 +119,7 @@ class DocumentList extends React.Component {
 
                      <div className="popBoxFooter">
                          <span id="spnHideDocuments">
-                             <button className="cancelButton" onClick={this.props.closeListofDocuments} >
+                             <button className="cancelButton" onClick={() => {this.props.closeListofDocuments()}} >
                                  <span>Close</span>
                              </button>
                          </span>

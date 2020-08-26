@@ -180,7 +180,7 @@ else{
                                     <tr>
                                         <td>
                                             <label>
-                                                <span>Email Address :</span>
+                                                <span>Email Address:</span>
                                             </label>
                                         </td>
 
@@ -230,9 +230,16 @@ else{
 
                         <div className="popBoxFooter">
                             <span id="spnCopyShare">
-                                <button className="cancelButton" onClick={this.props.newMeetingClose} >
+
+                             
+                                <button className="cancelButton" onClick={()=>{this.props.closePanel();this.props.newMeetingClose()}}>
+                              
                                     <span>close</span>
                                 </button>
+
+                            
+
+
 
                                 <button onClick={this.addParticipant} >
                                     <span>Save</span>

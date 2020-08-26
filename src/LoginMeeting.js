@@ -155,7 +155,9 @@ this.state.forgotUsername !== "" ?
 
             newMeetingDialog={this.props.newMeetingDialog}
             newMeetingClose={this.props.newMeetingClose}
+          
             createPopup={this.props.createPopup}
+            onSaveAddMeating={this.props.onSaveAddMeating}
           >
 
           </ScheduleMeetinglist>
