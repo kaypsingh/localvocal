@@ -232,7 +232,7 @@ else{
                             <span id="spnCopyShare">
 
                              
-                                <button className="cancelButton" onClick={()=>{this.props.closePanel();this.props.newMeetingClose()}}>
+                                <button className="cancelButton" onClick={()=>{this.props.closePanel();this.props.newMeetingClose();this.props.openSchedulePopup()}}>
                               
                                     <span>close</span>
                                 </button>

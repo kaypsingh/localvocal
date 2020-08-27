@@ -107,11 +107,16 @@ class DocumentList extends React.Component {
                                       </th>
                                   </tr>
 
-                                  <tr>
-                                      <td colSpan="4">
-                                          <span>Documents not available</span>
-                                      </td>
-                                  </tr>
+                                    {
+
+                                        <tr>
+                                            <td colSpan="4">
+                                                <span>Documents not available</span>
+                                            </td>
+                                        </tr>
+                                        
+
+                                    }
                               </tbody>
                           </table>
                       </div>

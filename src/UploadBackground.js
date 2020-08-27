@@ -31,7 +31,7 @@ class UploadBackground extends React.Component {
 
                     <div className="popBoxHeader" id="dvBackgroundImageTitle">
                         <h5>
-                            <span>Add background image in meeting javateam</span>
+        <span>Add background image in meeting {}</span>
                         </h5>
                     </div>
 

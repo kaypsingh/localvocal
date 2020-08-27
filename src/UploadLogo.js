@@ -31,7 +31,7 @@ class UploadLogo extends React.Component {
 
                     <div className="popBoxHeader" id="dvSetDocumentTitle">
                         <h5>
-                            <span>Add logo in meeting javateam</span>
+        <span>Add logo in meeting {}</span>
                         </h5>
                     </div>
 

@@ -1,9 +1,10 @@
 import React from 'react';
 import qs from 'qs'
 import axios from 'axios';
-import "flatpickr/dist/themes/material_green.css";
 
-import Flatpickr from "react-flatpickr";
+// import "flatpickr/dist/themes/material_green.css";
+
+// import Flatpickr from "react-flatpickr";
 
 
 class HistoryList extends React.Component {
@@ -17,8 +18,12 @@ class HistoryList extends React.Component {
 
             changeFromDate: 0,
             changeToDate: 0,
+            historyRes: [],
+            dataMsg: '',
+            statusHistory: ''
 
-            meetingDate: new Date()
+
+
 
         }
     }
@@ -34,46 +39,81 @@ class HistoryList extends React.Component {
         this.setState({ meetingToDate: event.target.value, changeToDate: 1 })
     }
 
+
+
     fetchHistoryResult = () => {
 
+        console.log(this.state.meetingFromDate)
+        console.log(this.state.meetingToDate)
 
-        if(this.state.meetingFromDate === '' && this.state.meetingToDate === ''){
+        if (this.state.meetingFromDate === '' && this.state.meetingToDate === '') {
+            var t = new Date();
+            var d = String(t.getDate()).padStart(2, '0');
+            var m = String(t.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var y = t.getFullYear();
 
-        var t = new Date();
-        var d = String(t.getDate()).padStart(2, '0');
-        var m = String(t.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var y = t.getFullYear();
+            var z = d + '-' + m + '-' + y;
 
-        t = d + '-' + m + '-' + y;
-        console.log(t)
 
-        var apiFromDate = t.split("-")[2] + "-" + t.split("-")[1] + "-" + t.split("-")[0];
-        
-        var apiToDate = t.split("-")[2] + "-" + t.split("-")[1] + "-" + t.split("-")[0];
+            var apiFromDate = z.split("-")[2] + "-" + z.split("-")[1] + "-" + z.split("-")[0];
+
+            var apiToDate = z.split("-")[2] + "-" + z.split("-")[1] + "-" + z.split("-")[0];
+
+            console.log(apiFromDate)
+        }
+
+        else if (this.state.meetingFromDate === '' && this.state.meetingToDate !== '') {
+
+            var t = new Date();
+            var d = String(t.getDate()).padStart(2, '0');
+            var m = String(t.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var y = t.getFullYear();
+
+            var z = d + '-' + m + '-' + y;
+
+            var h = this.state.meetingToDate
+
+            var apiFromDate = z.split("-")[2] + "-" + z.split("-")[1] + "-" + z.split("-")[0];
+
+            var apiToDate = h.split("-")[2] + "-" + h.split("-")[1] + "-" + h.split("-")[0];
 
         }
 
-        else if(this.state.meetingFromDate !== '' && this.state.meetingToDate !== ''){
+        else if (this.state.meetingFromDate !== '' && this.state.meetingToDate === '') {
+            var z = this.state.meetingFromDate
+         
+            var apiFromDate = z.split("-")[2] + "-" + z.split("-")[1] + "-" + z.split("-")[0];
 
-            var t = this.state.meetingFromDate
-            console.log(t)
-            var apiFromDate = t.split("-")[2] + "-" + t.split("-")[1] + "-" + t.split("-")[0];
+            var t = new Date();
+            var d = String(t.getDate()).padStart(2, '0');
+            var m = String(t.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var y = t.getFullYear();
+
+            var h = d + '-' + m + '-' + y;
+            var apiToDate = h.split("-")[2] + "-" + h.split("-")[1] + "-" + h.split("-")[0];
+          
+
+        }
+
+        else if (this.state.meetingFromDate !== '' && this.state.meetingToDate !== '') {
+
+            var z = this.state.meetingFromDate
+            var h = this.state.meetingToDate
+
+            var apiFromDate = z.split("-")[2] + "-" + z.split("-")[1] + "-" + z.split("-")[0];
             console.log(apiFromDate)
 
-            var z = this.state.meetingToDate
-            var apiToDate = z.split("-")[2] + "-" + z.split("-")[1] + "-" + z.split("-")[0];
-        
+            var apiToDate = h.split("-")[2] + "-" + h.split("-")[1] + "-" + h.split("-")[0];
+            console.log(apiToDate)
 
 
         }
-
-
-       
 
         axios.post('https://api.videomeet.in/v2/room_history.php', qs.stringify({
 
             authkey: 'M2atKiuCGKOo9Mj3',
             roomname: this.props.historyActionRoomname,
+            // roomname: 'javateam',
             fromdate: apiFromDate,
             todate: apiToDate 
 
@@ -85,9 +125,13 @@ class HistoryList extends React.Component {
         )
             .then((response) => {
 
-                console.log(response)
+                console.log(response.data.status)
 
                 alert(response.data.msg)
+
+                console.log(response)
+
+                this.setState({ historyRes: response.data.data, dataMsg: response.data.msg, statusHistory: response.data.status })
 
             },
                 (error) => {
@@ -130,7 +174,7 @@ class HistoryList extends React.Component {
 
                         <div className="popBoxBody">
                             <div>
-                                <Flatpickr data-enable-time
+                                {/* <Flatpickr data-enable-time
                                  options={{
                                     dateFormat: 'd-m-Y',
         
@@ -145,18 +189,19 @@ class HistoryList extends React.Component {
                                     time_24hr: false,
                                     noCalendar: false
         
-                                  }} 
-                                
-                                
-                                
-                                type="text" className="textBox flatpickr-input"
+                                  }}  */}
+
+
+
+                                <input type="text" className="textBox flatpickr-input"
                                     placeholder={today}
-                                    // onChange={this.handleFromDate}
-                                    onChange={meetingDate => {
-                                        this.setState({ meetingDate },() => {console.log(this.state.meetingDate)});
-                                      }}
+                                    onChange={this.handleFromDate}
+                                    //     onChange={meetingDate => {
+                                    //         this.setState({ meetingDate }, () => { console.log(this.state.meetingDate) });
+                                    //     }
+                                    // }
                                     id="txtHistoryFromDate"
-                                    style={{ color: 'black', width: 200 }} ></Flatpickr>
+                                    style={{ color: 'black', width: 200 }} ></input>
 
                                 <input type="text" className="textBox flatpickr-input"
                                     placeholder={today}
@@ -207,27 +252,61 @@ class HistoryList extends React.Component {
 
                                         {
 
-                                            <tr>
+                                            this.state.statusHistory !== 0 ?
+                                                this.state.historyRes.map((res, k) => {
 
-                                                <td>web</td>
-                                                <td>14-07-2020 14:40</td>
+                                                    var recOn = res['recording_on']
+                                                    var streamOn = res['streaming_on']
 
-                                                <td>
-                                                    <a href="" style={{ color: 'green' }} target="_blank">2</a>
-                                                </td>
+                                                    if (recOn === 1) {
+                                                        var recStatus = "Y"
+                                                    }
 
-                                                <td>N</td>
-                                                <td>N</td>
-                                                <td>14-07-2020 14:40</td>
-                                                <td>0</td>
-                                            </tr>
+                                                    else {
+                                                        var recStatus = "N"
+                                                    }
+
+                                                    if (streamOn === 1) {
+                                                        var streamStatus = "Y"
+                                                    }
+
+                                                    else {
+                                                        var streamStatus = "N"
+                                                    }
+
+
+
+
+                                                    return (
+                                                        <tr>
+
+                                                            <td>{res['request_origin']}</td>
+                                                            <td>14-07-2020 14:40</td>
+
+                                                            <td>
+                                                                <a href="" style={{ color: 'green' }} target="_blank">{res['totalparticipant']}</a>
+                                                            </td>
+
+                                                            <td>{recStatus}</td>
+                                                            <td>{streamStatus}</td>
+                                                            <td>{res['end_conference']}</td>
+                                                            <td>0</td>
+                                                        </tr>
+                                                    )
+
+
+                                                })
+                                                :
+
+                                                <tr>
+                                                    <td colSpan="5">
+                                                        <span>Recording not available</span>
+                                                    </td>
+                                                </tr>
+
                                         }
-                                        {/* 
-                                        <tr>
-                                            <td colSpan="7">
-                                                <span>No Records Found.</span>
-                                            </td>
-                                        </tr> */}
+
+
 
 
 
@@ -260,6 +339,4 @@ class HistoryList extends React.Component {
 }
 
 export default HistoryList;
-
-
 

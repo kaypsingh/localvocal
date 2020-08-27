@@ -8,19 +8,24 @@ import ChatList from './ChatList';
 import HistoryList from './HistoryList';
 import ShareDetails from './ShareDetails';
 
-import "flatpickr/dist/themes/material_green.css";
+// import "flatpickr/dist/themes/material_green.css";
 
-import Flatpickr from "react-flatpickr";
+// import Flatpickr from "react-flatpickr";
+
 import DeleteRoom from './DeleteRoom';
 import UploadDocument from './UploadDocument';
 import UploadLogo from './UploadLogo';
 import UploadBackground from './UploadBackground';
+import SharePanelist from './SharePanelist';
 
 class ScheduleMeetinglist extends React.Component {
 
   constructor(props) {
     super(props)
     this.state = {
+
+
+      schedulePopup: 1,
 
       greetingString: '',
 
@@ -81,13 +86,39 @@ class ScheduleMeetinglist extends React.Component {
 
       uploadLogoPopup: 0,
 
-      uploadBackgroundPopup: 0
+      uploadBackgroundPopup: 0,
       // date: new Date()
+
+      sharePanelPopup: 0,
+      sharePanelResponse: [],
+      secondResponse: [],
+      pwdCounter: 0
 
     }
   }
 
+pwdStatus = () => {
+  this.setState({pwdCounter: 1})
+}
 
+  closeSchedulePopup = () => {
+    this.setState({schedulePopup: 0})
+  }
+
+  openSchedulePopup = () => {
+    this.setState({schedulePopup: 1})
+  }
+
+  sharePanel = (r) => {
+
+    console.log(r)
+    this.setState({ sharePanelPopup: 1, secondResponse: r })
+
+  }
+
+  closeSharePanel = () => {
+    this.setState({ sharePanelPopup: 0 })
+  }
 
 
   uploadDoc = () => {
@@ -123,6 +154,8 @@ class ScheduleMeetinglist extends React.Component {
 
   quickPwdLogic = () => {
 
+    console.log(this.state.panelActionRoomname)
+    console.log(this.state.quickPwd)
     axios.post('https://api.videomeet.in/v2/conference.php/roompassupdate', qs.stringify({
 
       authkey: 'M2atKiuCGKOo9Mj3',
@@ -213,9 +246,45 @@ class ScheduleMeetinglist extends React.Component {
     this.setState({ panelistActionPopup: 0 })
   }
 
+
+
+deleteParticipant = (r) => {
+
+  console.log(r)
+  
+  axios.post('https://api.videomeet.in/v2/participants.php/delete', qs.stringify({
+
+    authkey: 'M2atKiuCGKOo9Mj3',
+    participantid: r.participantid
+
+  }), {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    "Access-Control-Allow-Origin": "*",
+  }
+
+  )
+    .then((response) => {
+
+      console.log(response.data.msg)
+      alert(response.data.msg)
+
+      this.listPanelistAction(this.state.sharePanelResponse)
+
+    },
+      (error) => {
+        console.log(error)
+      }
+    )
+
+
+
+
+}
+
+
   listPanelistAction = (r) => {
     console.log(r)
-    this.setState({ panelistActionPopup: 1, panelActionRoomname: r.roomname, panelActionPwd: r.room_pass })
+    this.setState({ panelistActionPopup: 1, panelActionRoomname: r.roomname, panelActionPwd: r.room_pass, sharePanelResponse: r })
 
 
     axios.post('https://api.videomeet.in/v2/participants.php/participantlist', qs.stringify({
@@ -238,6 +307,9 @@ class ScheduleMeetinglist extends React.Component {
           this.setState({ panelActionResponse: response.data.data, panelActionDataMsg: response.data.msg })
         }
 
+        else if(response.data.msg === "No record found"){
+          this.setState({panelActionDataMsg: response.data.msg})
+        }
 
 
       },
@@ -663,7 +735,7 @@ class ScheduleMeetinglist extends React.Component {
 
         <div id="dvListScheduleMeeting" className="popBox" style={{
 
-          display: this.props.createPopup === 0 && this.props.parentData !== '' ? '' : 'none'
+          display: this.props.createPopup === 0 && this.props.parentData !== '' && this.state.schedulePopup === 1 ? '' : 'none'
         }}>
 
           <div className="popBoxInner">
@@ -806,11 +878,11 @@ class ScheduleMeetinglist extends React.Component {
             </div>
 
             <div className="popBoxFooter">
-              <a href="">
-                <button className="cancelButton" >
+             
+                <button className="cancelButton" onClick={()=>{this.closeSchedulePopup();this.props.scheduleButton()}} >
                   <span>close</span>
-                </button></a>
-              <button onClick={this.props.newMeetingDialog}>
+                </button>
+              <button onClick={()=>{this.props.newMeetingDialog();this.closeSchedulePopup()}}>
                 <span>New Meeting</span>
               </button>
             </div>
@@ -826,7 +898,7 @@ class ScheduleMeetinglist extends React.Component {
         <div id="dvCreateNewMeeting" className="popBox"
 
           style={{
-            display: this.props.createPopup === 1 || this.state.editPopup === 1 ? 'block' : 'none'
+            display: (this.props.createPopup === 1 && this.state.schedulePopup === 0 )|| this.state.editPopup === 1 ? 'block' : 'none'
 
 
 
@@ -1021,7 +1093,7 @@ class ScheduleMeetinglist extends React.Component {
 
 
             <div className="popBoxFooter">
-              <button className="cancelButton" onClick={() => { this.props.newMeetingClose(); this.closeEditMeeting() }}>Close</button>
+              <button className="cancelButton" onClick={() => { this.props.newMeetingClose(); this.closeEditMeeting(); this.openSchedulePopup() }}>Close</button>
 
               <button id="butSave" onClick={() => { this.createFunctionality(); this.props.onSaveAddMeating() }} style={{ display: this.props.createPopup === 1 ? 'inline-block' : 'none' }}>
                 <span >Save</span>
@@ -1080,7 +1152,9 @@ class ScheduleMeetinglist extends React.Component {
 
               <span style={{ float: "right", position: "relative", top: -25 }}>
                 <h5>
-                  <span>Password:</span>
+                  <span onClick={this.pwdStatus}>Password:</span>
+
+                  {this.state.pwdCounter === 0 ? this.state.panelActionPwd  :
                   <span id="spnEditRoomPassword">{
 
                     this.state.roomPwdUpdateMsg !== "room pass update successfully." ?
@@ -1098,7 +1172,7 @@ class ScheduleMeetinglist extends React.Component {
 
 
                   }
-                  </span>
+                  </span>}
                 </h5>
               </span>
             </div>
@@ -1151,13 +1225,13 @@ class ScheduleMeetinglist extends React.Component {
                               <td>{par.email}</td>
                               <td>{par.code}</td>
                               <td>
-                                <input type="radio" id="radYesCodeStatus0" checked={par.code_expire == "1"} name="radCodeStatus0" style={{ cursor: 'pointer' }}></input>
+                                <input type="radio" id="radYesCodeStatus0" readOnly checked={par.code_expire == "1"} name="radCodeStatus0" style={{ cursor: 'pointer' }}></input>
 
                                 <label for="radYesCodeStatus">
                                   <span>Yes</span>
                                 </label>
 
-                                <input type="radio" id="radNoCodeStatus0" checked={par.code_expire == "0"} name="radCodeStatus0" style={{ cursor: 'pointer' }}></input>
+                                <input type="radio" id="radNoCodeStatus0" readOnly checked={par.code_expire == "0"} name="radCodeStatus0" style={{ cursor: 'pointer' }}></input>
 
                                 <label for="radNoCodeStatus">
                                   <span>No</span>
@@ -1166,13 +1240,13 @@ class ScheduleMeetinglist extends React.Component {
                               </td>
 
                               <td>
-                                <input type="radio" id="radYesCoHost0" checked={par.ishost == 1} name="radCoHost0" style={{ cursor: 'pointer' }}></input>
+                                <input type="radio" id="radYesCoHost0" readOnly checked={par.ishost == 1} name="radCoHost0" style={{ cursor: 'pointer' }}></input>
 
                                 <label for="radYesCoHost">
                                   <span>Yes</span>
                                 </label>
 
-                                <input type="radio" id="radNoCoHost0" checked={par.ishost == 0} name="radCoHost0" style={{ cursor: 'pointer' }}></input>
+                                <input type="radio" id="radNoCoHost0" readOnly checked={par.ishost == 0} name="radCoHost0" style={{ cursor: 'pointer' }}></input>
 
                                 <label for="radNoCoHost">
                                   <span>No</span>
@@ -1181,16 +1255,16 @@ class ScheduleMeetinglist extends React.Component {
 
                               <td style={{ textAlign: 'center' }}>
 
-                                <a href="">
-                                  <img src={deleteActionIcon} className="image-size-set" alt title="Delete" />
-                                </a>
+                             
+                                  <img src={deleteActionIcon} onClick={() => {this.deleteParticipant(par)}} className="image-size-set" alt title="Delete" />
+                              
 
                                 <br></br>
                                 <br></br>
 
-                                <a href="">
-                                  <img src={shareActionIcon} className="image-size-set" alt title="Copy and Share" />
-                                </a>
+                                {/* <a href=""> */}
+                                <img src={shareActionIcon} onClick={() => { this.sharePanel(par) }} className="image-size-set" alt title="Copy and Share" />
+                                {/* </a> */}
 
                               </td>
 
@@ -1245,6 +1319,20 @@ class ScheduleMeetinglist extends React.Component {
         </div>
 
 
+        <div id="dvShareToPenalist" className="popBox" style={{ display: this.state.sharePanelPopup === 1 ? 'block' : 'none' }}>
+
+          <SharePanelist
+            sharePanelResponse={this.state.sharePanelResponse}
+            secondResponse={this.state.secondResponse}
+            bc={this.props.bc}
+            closeSharePanel={this.closeSharePanel}
+          ></SharePanelist>
+
+        </div>
+
+
+
+
         <div id="dvAddDocment" className="popBox" style={{ display: this.state.uploadDocPopup === 1 ? 'block' : 'none' }}>
 
           <UploadDocument
@@ -1260,10 +1348,10 @@ class ScheduleMeetinglist extends React.Component {
           ></UploadLogo>
         </div>
 
-        <div id="dvBackgroundImage" className="popBox" style={{display: this.state.uploadBackgroundPopup === 1 ? 'block' : 'none'}}>
+        <div id="dvBackgroundImage" className="popBox" style={{ display: this.state.uploadBackgroundPopup === 1 ? 'block' : 'none' }}>
           <UploadBackground
             closeUploadBackground={this.closeUploadBackground}
-        ></UploadBackground>
+          ></UploadBackground>
 
         </div>
 
@@ -1337,6 +1425,7 @@ class ScheduleMeetinglist extends React.Component {
             closePanel={this.closePanel}
             clickPanelIcon={this.state.clickPanelIcon}
             newMeetingDialog={this.props.newMeetingDialog}
+            openSchedulePopup={this.openSchedulePopup}
 
           ></Panelist> : ''
         }

@@ -35,6 +35,8 @@ class ChatList extends React.Component {
 
                 alert(response.data.msg)
 
+                this.fetchChatResult()
+
 
 
             },
@@ -51,7 +53,8 @@ class ChatList extends React.Component {
         axios.post('https://api.videomeet.in/v2/chat.php/chatlist', qs.stringify({
 
             authkey: 'M2atKiuCGKOo9Mj3',
-            roomname: this.props.chatActionRoomname,
+            roomname: 'javateam'
+            // roomname: this.props.chatActionRoomname,
 
         }), {
             'Content-Type': 'application/x-www-form-urlencoded',

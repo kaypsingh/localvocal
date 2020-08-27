@@ -34,6 +34,10 @@ class App extends React.Component {
   }
 
 
+  logoutLogic = () => {
+    this.setState({login: 0, meetingbox: 0, name: ''})
+  }
+
   newMeetingDialog = () => {
     this.setState({ createPopup: 1 })
   }
@@ -133,7 +137,7 @@ class App extends React.Component {
 
   scheduleApi = () => {
 
-console.log('ji')
+
     this.setState({ createPopup: 0 })
     axios.post('https://api.videomeet.in/v2/conference.php/confrencelist', qs.stringify({
 
@@ -196,6 +200,12 @@ console.log('ji')
     this.setState({ meetingbox: 1 })
 
   }
+
+  scheduleButton = () => {
+    this.setState({ meetingbox: 0 })
+  }
+
+
 
   getName = (val) => {
     this.setState({ name: val })
@@ -281,6 +291,7 @@ console.log('ji')
           newMeetingClose={this.newMeetingClose}
           createPopup={this.state.createPopup}
           onSaveAddMeating={this.onSaveAddMeating}
+          scheduleButton={this.scheduleButton}
 
         ></LoginMeeting>
 
@@ -290,3 +301,5 @@ console.log('ji')
 }
 
 export default App;
+
+

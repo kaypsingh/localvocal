@@ -158,6 +158,7 @@ this.state.forgotUsername !== "" ?
           
             createPopup={this.props.createPopup}
             onSaveAddMeating={this.props.onSaveAddMeating}
+            scheduleButton={this.props.scheduleButton}
           >
 
           </ScheduleMeetinglist>

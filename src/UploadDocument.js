@@ -31,7 +31,7 @@ class UploadDocument extends React.Component {
 
                     <div className="popBoxHeader" id="dvSetDocumentTitle">
                         <h5>
-                            <span>Add document(s) in meeting javateam</span>
+        <span>Add document(s) in meeting {}</span>
                         </h5>
                     </div>
 
