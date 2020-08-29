@@ -8,12 +8,76 @@ class UploadBackground extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-
+            selectedFileImage:''
 
         }
     }
 
+    handleInputChange = (event) => {
+        console.log(event.target.files[0])
+        this.setState({
+            selectedFileImage: event.target.files[0],
+          })
+    }
 
+
+    uploadingBack = () => {
+
+
+        // if(document.getElementById('addfile-input-image').files.length==0) {
+        //     alert("Please upload background image !");
+        //     return false;
+        // }
+        
+        // var filename = document.getElementById('addfile-input-image').files[0].name;
+        // var filesize = document.getElementById('addfile-input-image').files[0].size;
+        
+        // var fileExt = filename.substring(filename.lastIndexOf(".")+1,filename.length);
+        // fileExt = fileExt.toLowerCase();
+        
+        // if(fileExt!="jpg" && fileExt!="jpeg" && fileExt!="png" && fileExt!="gif") {
+        //     alert("Only jpg, jpeg, png, gif file extensions are allowed !");
+        //     return false;
+        // }
+        
+        // if((filesize/1024) > 1536) {
+        //     alert("Background image not more than 1.5 MB size !");
+        //     return false;
+        // }
+        
+        var formData = new FormData();
+        formData.append("roomname", 'hanumangarh');
+        formData.append("username", 'kpkpkp');
+        formData.append("image", this.state.selectedFileImage);
+
+
+
+
+
+        axios.post('https://bridge01.videomeet.in/fileupload1.php',  formData , {
+
+           
+            'content-type': 'multipart/form-data',
+             "Access-Control-Allow-Origin": "*"
+            
+           }
+         
+           )
+             .then((response) => {
+         
+               console.log(response)
+ 
+               alert(response.data.msg)
+             
+         
+             },
+               (error) => {
+                 console.log(error)
+               }
+             )
+         
+    }
+    
 
 
 
@@ -30,8 +94,8 @@ class UploadBackground extends React.Component {
                 <div className="popBoxInner">
 
                     <div className="popBoxHeader" id="dvBackgroundImageTitle">
-                        <h5>
-        <span>Add background image in meeting {}</span>
+                        <h5 style={{ fontSize: 18, color: 'black' }}>
+                            <span>Add background image in meeting {}</span>
                         </h5>
                     </div>
 
@@ -48,11 +112,11 @@ class UploadBackground extends React.Component {
                                     <td style={{ "width": "70%" }}>
                                         <div className="cstomFile">
                                             <form id="filecatcher1">
-                                                <label for="addfile-input" className="custom-file-upload fileBtn">
+                                                <label for="addfile-input" className="custom-file-upload fileBtn" onChange={this.handleInputChange}>
                                                     <span>Click to Upload File</span>
                                                 </label>
 
-                                                <input id="addfile-input" names="files[]" type="file" style={{display: 'none'}}></input>
+                                                <input id="addfile-input" names="files[]" type="file" style={{ display: 'none' }}></input>
                                             </form>
                                         </div>
                                     </td>
@@ -86,7 +150,7 @@ class UploadBackground extends React.Component {
                                 <span>Close</span>
                             </button>
 
-                            <button id="butBGAdd">
+                            <button id="butBGAdd" onClick={this.uploadingBack}>
                                 <span>Add</span>
                             </button>
 

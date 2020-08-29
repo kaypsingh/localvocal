@@ -24,7 +24,11 @@ class ScheduleMeetinglist extends React.Component {
     super(props)
     this.state = {
 
+      documentMessage: '',
 
+      documentData: [],
+
+    
       schedulePopup: 1,
 
       greetingString: '',
@@ -96,6 +100,9 @@ class ScheduleMeetinglist extends React.Component {
 
     }
   }
+
+
+ 
 
 pwdStatus = () => {
   this.setState({pwdCounter: 1})
@@ -214,7 +221,7 @@ pwdStatus = () => {
   }
 
   closeListofDocuments = () => {
-    this.setState({ documentPopup: 0, panelistActionPopup: 1 })
+    this.setState({ documentPopup: 0 })
 
   }
 
@@ -245,6 +252,44 @@ pwdStatus = () => {
   roomActionClose = () => {
     this.setState({ panelistActionPopup: 0 })
   }
+
+  panelRedirect = () => {
+    this.setState({ panelistActionPopup: 1 })
+  } 
+
+
+  fetchDocumentResult = () => {
+    axios.post('https://api.videomeet.in/v2/conference.php/filelist', qs.stringify({
+
+        authkey: 'M2atKiuCGKOo9Mj3',
+        roomname: this.state.panelActionRoomname,
+        ownername: this.state.panelUsername
+
+    }), {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        "Access-Control-Allow-Origin": "*",
+    }
+
+    )
+        .then((response) => {
+
+            console.log(response)
+
+     this.roomActionClose()
+
+            // this.setState({documentMessage: response.data.msg})
+            this.setState({ documentMessage: response.data.msg, documentData: response.data.data })
+
+
+        },
+            (error) => {
+                console.log(error)
+            }
+        )
+
+}
+
+
 
 
 
@@ -367,8 +412,22 @@ deleteParticipant = (r) => {
 
   handleMeetingRoomName = (event) => {
 
+
+			var obj = event.target.value
+			obj = obj.replace(/ +/g, '');
+			var specialChars = "<>!#$%^&*()+[]{}?:;|'\"\\,/~`=@.-_"; //@.-_
+			for(var i = 0; i < specialChars.length;i++){
+		        if(obj.indexOf(specialChars[i]) > -1){
+		        	obj = obj.split(specialChars[i]).join('');
+		        }
+		    }
+
+
+
+
+
     console.log(event.target.value)
-    this.setState({ meetingRoomName: event.target.value }, () => { console.log(this.state.meetingRoomName) })
+    this.setState({ meetingRoomName: obj }, () => { console.log(this.state.meetingRoomName) })
 
     if (event.target.value === "") {
       this.setState({ emptyValue: 0 })
@@ -444,7 +503,7 @@ deleteParticipant = (r) => {
     console.log(string)
     var result = string.substring(string.lastIndexOf(" ") + 1);
     var str = result.substring(0, result.length - 3);
-    this.setState({ editPopup: 1, editResponse: r, editTime: str })
+    this.setState({ editPopup: 1, editResponse: r, editTime: str } ,() => {this.closeSchedulePopup()})
 
   }
 
@@ -565,7 +624,7 @@ deleteParticipant = (r) => {
 
     )
       .then((response) => {
-        this.setState({ editPopup: 0 }, () => this.props.scheduleApi())
+        this.setState({ editPopup: 0 , schedulePopup: 1 }, () => this.props.scheduleApi())
         console.log(response)
         alert(response.data.msg)
 
@@ -663,7 +722,7 @@ deleteParticipant = (r) => {
 
               console.log('kooo')
               //do something here
-              this.setState({ panelistDialog: 1 })
+              this.setState({ panelistDialog: 1 },() => {this.props.newMeetingClose()})
             }
           })
 
@@ -682,15 +741,18 @@ deleteParticipant = (r) => {
   }
 
   logoutHandle = () => {
-    var c = localStorage.getItem('added-credentials')
-    console.log(c)
+
+    this.setState({schedulePopup: 0},() => {this.props.logoutLogic()})
+
+  //   var c = localStorage.getItem('added-credentials')
+  //   console.log(c)
 
 
 
-    localStorage.removeItem('added-credentials');
-    console.log(c)
+  //   localStorage.removeItem('added-credentials');
+  //   console.log(c)
 
-  }
+ }
 
   onValueChange = (event) => {
 
@@ -740,9 +802,13 @@ deleteParticipant = (r) => {
 
           <div className="popBoxInner">
             <div className="popBoxHeader" id="dvScheduleMeetingTitle">
+          
+    
 
-              <h5>
-                <span>Schedule Meeting for {this.props.bc}
+              <h5 style={{fontSize: 18, color:'black', textAlign:'left'}} >
+                <span>Schedule Meeting for
+                  
+                  <a href="#" style={{font: 'white'}} >{this.props.bc}</a>
 
                 </span>
               </h5>
@@ -788,6 +854,16 @@ deleteParticipant = (r) => {
                     this.props.parentData === "conference list fetched successfully" ?
 
                       this.props.dataSource.map((res, k) => {
+
+                        var dateTime = res['conferencescheduletime']
+
+                        var arrDateTime = dateTime.split(" ");
+                        var date = arrDateTime[0].split("-")[2]+"-"+arrDateTime[0].split("-")[1]+"-"+arrDateTime[0].split("-")[0];
+                        var time = arrDateTime[1].split(":")[0]+":"+arrDateTime[1].split(":")[1];
+                        dateTime = date+" "+time;
+
+
+
                         var j = Object.values(res)
 
                         if (res['mode'] === "1") {
@@ -816,13 +892,13 @@ deleteParticipant = (r) => {
                               <td>
                                 <img className="showpassword" style={{ height: 10, width: 10, cursor: 'pointer', display: res['room_pass'] === '' ? 'none' : '' }} src={lock} title={res['room_pass']} />
                                 <img className="enterroomdirectly" style={{ height: 10, width: 10, cursor: 'pointer' }} src={videoIcon} title="Click to enter the room" />
-                                <a href="">{res['roomname']}</a>
+                                <a href="#" onClick={() => { this.listPanelistAction(res); this.props.newMeetingDialog() }}>{res['roomname']}</a>
                               </td>
                               <td>{res['topic']}</td>
                               <td>
                                 <span>{conMode}</span>
                               </td>
-                              <td>{res['conferencescheduletime']}</td>
+                              <td>{dateTime}</td>
 
                               <td style={{ textAlign: 'center' }}>
 
@@ -849,7 +925,7 @@ deleteParticipant = (r) => {
                                 <span className="spn-pipe-position">{"   "}</span>
 
 
-                                <img src={editIcon} onClick={() => this.editMeetingDialog(res)} className="image-size-set" alt title="Edit" />
+                                <img src={editIcon} onClick={() => {this.editMeetingDialog(res)}} className="image-size-set" alt title="Edit" />
 
 
                               </td>
@@ -879,7 +955,7 @@ deleteParticipant = (r) => {
 
             <div className="popBoxFooter">
              
-                <button className="cancelButton" onClick={()=>{this.closeSchedulePopup();this.props.scheduleButton()}} >
+                <button className="cancelButton" onClick={()=>{this.closeSchedulePopup();this.props.scheduleButton();this.props.panelRedirect()}} >
                   <span>close</span>
                 </button>
               <button onClick={()=>{this.props.newMeetingDialog();this.closeSchedulePopup()}}>
@@ -898,14 +974,14 @@ deleteParticipant = (r) => {
         <div id="dvCreateNewMeeting" className="popBox"
 
           style={{
-            display: (this.props.createPopup === 1 && this.state.schedulePopup === 0 )|| this.state.editPopup === 1 ? 'block' : 'none'
+            display: (this.props.createPopup === 1 && this.state.schedulePopup === 0 )|| (this.state.editPopup === 1 ) ? 'block' : 'none'
 
 
 
           }}>
           <div className="popBoxInner">
             <div className="popBoxHeader" id="dvSetTitle">
-              <h5>
+              <h5 style={{fontSize: 18, color:'black', textAlign:'left'}}>
                 <span>{this.state.greetingString} </span>
                 {this.props.uname}
               </h5>
@@ -990,18 +1066,20 @@ deleteParticipant = (r) => {
                       </td>
 
                       <td>
-                        <input type="text" maxLength="50" className="textBox" onChange={this.handleMeetingRoomName}
-                          placeholder="Name of Room" id="txtRoomName"></input>
+                        <input type="text" maxLength="50" className="textBox" onChange={this.handleMeetingRoomName} 
+                          placeholder="Name of Room"
+                           id="txtRoomName"></input>
 
                         <span id="spnRoomExists" style={{ display: 'block', fontSize: 11, padding: 5, top: 4, position: 'relative' }}>
 
-                          <span style={{ color: this.state.roomAvail === "No record found." ? 'green' : 'red' }}>
+                          <span style={{ color: this.state.roomAvail === "No record found." && this.state.meetingRoomName.length >=4 ? 'green' : 'red' }}>
 
-                            {this.state.roomAvail === "No record found." && this.state.emptyValue !== 0 ? 'available' :
-                              this.state.roomAvail === "Data fetched successfully." && this.state.emptyValue !== 0 ? 'not available' :
+                            {this.state.roomAvail === "No record found." && this.state.emptyValue !== 0 && this.state.meetingRoomName.length >= 4 ? `${this.state.meetingRoomName} is available` :
+                              this.state.roomAvail === "Data fetched successfully." && this.state.emptyValue !== 0 && this.state.meetingRoomName.length >= 4 ? `${this.state.meetingRoomName} is not available` :
                                 this.state.roomAvail === "No record found." && this.state.emptyValue === 0 ? 'Room name cannot be empty' :
                                   this.state.roomAvail === "Data fetched successfully." && this.state.emptyValue === 0 ? 'Room name cannot be empty' :
-                                    this.state.roomAvail === "" && this.state.emptyValue === 0 ? ''
+                                    this.state.roomAvail === "" && this.state.emptyValue === 0 ? '' :
+                                    this.state.meetingRoomName.length < 4 && this.state.meetingRoomName.length > 0 ? 'Room name can not be of less than 4 characters' 
 
                                       : ''}</span>
 
@@ -1146,12 +1224,12 @@ deleteParticipant = (r) => {
         <div id="dvListParticipant" className="popBox" style={{ display: this.state.panelistActionPopup === 1 ? 'block' : 'none' }}>
           <div className="popBoxInner">
             <div className="popBoxHeader" id="dvListParticipantTitle" >
-              <h5>
+              <h5 style={{fontSize: 18, color:'black', textAlign:'left'}} >
                 <span>List of panelist in {this.state.panelActionRoomname}</span>
               </h5>
 
               <span style={{ float: "right", position: "relative", top: -25 }}>
-                <h5>
+                <h5 style={{fontSize: 18, color:'black'}}>
                   <span onClick={this.pwdStatus}>Password:</span>
 
                   {this.state.pwdCounter === 0 ? this.state.panelActionPwd  :
@@ -1181,27 +1259,33 @@ deleteParticipant = (r) => {
               <table className="tableBox" id="tblListParticipant" style={{ "width": "100%" }}>
                 <tbody>
                   <tr>
-                    <th style={{ "width": "20%" }}>
+                    <th >
+                      {/* style={{ "width": "17%" }} */}
                       <span>Name</span>
                     </th>
 
-                    <th style={{ "width": "30%" }}>
+                    <th >
+                    {/* style={{ "width": "22%" }} */}
                       <span>Email Address</span>
                     </th>
 
-                    <th style={{ "width": "10%" }}>
+                    <th>
+                    {/* style={{ "width": "9%" }} */}
                       <span>Code</span>
                     </th>
 
-                    <th style={{ "width": "15%" }}>
+                    <th >
+                    {/* style={{ "width": "15%" }} */}
                       <span>Active</span>
                     </th>
 
-                    <th style={{ "width": "15%" }}>
+                    <th >
+                    {/* style={{ "width": "14%" }} */}
                       <span>Co-Host</span>
                     </th>
 
-                    <th style={{ "width": "5%", textAlign: 'center' }}>
+                    <th style={{ textAlign: 'center' }}>
+                    {/* "width": "7%", */}
                       <span>Action</span>
                     </th>
                   </tr>
@@ -1225,13 +1309,13 @@ deleteParticipant = (r) => {
                               <td>{par.email}</td>
                               <td>{par.code}</td>
                               <td>
-                                <input type="radio" id="radYesCodeStatus0" readOnly checked={par.code_expire == "1"} name="radCodeStatus0" style={{ cursor: 'pointer' }}></input>
+                                <input type="radio" id="radYesCodeStatus1" readOnly checked={par.code_expire == 0}  style={{ cursor: 'pointer' }}></input>
 
                                 <label for="radYesCodeStatus">
                                   <span>Yes</span>
                                 </label>
 
-                                <input type="radio" id="radNoCodeStatus0" readOnly checked={par.code_expire == "0"} name="radCodeStatus0" style={{ cursor: 'pointer' }}></input>
+                                <input type="radio" id="radNoCodeStatus1" readOnly checked={par.code_expire == 1}  style={{ cursor: 'pointer' }}></input>
 
                                 <label for="radNoCodeStatus">
                                   <span>No</span>
@@ -1240,13 +1324,13 @@ deleteParticipant = (r) => {
                               </td>
 
                               <td>
-                                <input type="radio" id="radYesCoHost0" readOnly checked={par.ishost == 1} name="radCoHost0" style={{ cursor: 'pointer' }}></input>
+                                <input type="radio" id="radYesCoHost1" readOnly checked={par.ishost == 1}  style={{ cursor: 'pointer' }}></input>
 
                                 <label for="radYesCoHost">
                                   <span>Yes</span>
                                 </label>
 
-                                <input type="radio" id="radNoCoHost0" readOnly checked={par.ishost == 0} name="radCoHost0" style={{ cursor: 'pointer' }}></input>
+                                <input type="radio" id="radNoCoHost1" readOnly checked={par.ishost == 0}  style={{ cursor: 'pointer' }}></input>
 
                                 <label for="radNoCoHost">
                                   <span>No</span>
@@ -1295,19 +1379,19 @@ deleteParticipant = (r) => {
 
               <span id="spnShowDocuments">
 
-                <button onClick={this.seeListOfDocuments}>
+                <button onClick={()=>{this.seeListOfDocuments()}}>
                   <span>Document</span>
                 </button>
 
-                <button onClick={this.myRecordings}>
+                <button onClick={()=>{this.myRecordings()}}>
                   <span>My Recording</span>
                 </button>
 
-                <button onClick={this.myChats}>
+                <button onClick={()=>{this.myChats()}}>
                   <span>My Chat</span>
                 </button>
 
-                <button onClick={this.myHistory}>
+                <button onClick={()=>{this.myHistory()}}>
                   <span>History</span>
                 </button>
 
@@ -1333,10 +1417,13 @@ deleteParticipant = (r) => {
 
 
 
-        <div id="dvAddDocment" className="popBox" style={{ display: this.state.uploadDocPopup === 1 ? 'block' : 'none' }}>
+        <div id="dvAddDocument" className="popBox" style={{ display: this.state.uploadDocPopup === 1 ? 'block' : 'none' }}>
 
           <UploadDocument
             closeUploadDoc={this.closeUploadDoc}
+            panelActionRoomname={this.state.panelActionRoomname}
+            fetchDocumentResult={this.fetchDocumentResult}
+          
 
           ></UploadDocument>
 
@@ -1345,12 +1432,14 @@ deleteParticipant = (r) => {
         <div id="dvAddDocumentLogo" className="popBox" style={{ display: this.state.uploadLogoPopup === 1 ? 'block' : 'none' }} >
           <UploadLogo
             closeUploadLogo={this.closeUploadLogo}
+            panelActionRoomname={this.state.panelActionRoomname}
           ></UploadLogo>
         </div>
 
         <div id="dvBackgroundImage" className="popBox" style={{ display: this.state.uploadBackgroundPopup === 1 ? 'block' : 'none' }}>
           <UploadBackground
             closeUploadBackground={this.closeUploadBackground}
+            panelActionRoomname={this.state.panelActionRoomname}
           ></UploadBackground>
 
         </div>
@@ -1371,6 +1460,13 @@ deleteParticipant = (r) => {
               closeUploadDoc={this.closeUploadDoc}
               closeUploadLogo={this.closeUploadLogo}
               closeUploadBackground={this.closeUploadBackground}
+              panelRedirect={this.panelRedirect}
+              roomActionClose={this.roomActionClose}
+
+              fetchDocumentResult={this.fetchDocumentResult}
+              documentMessage={this.state.documentMessage}
+              documentData={this.state.documentData}
+
 
             ></DocumentList>
 
@@ -1385,6 +1481,8 @@ deleteParticipant = (r) => {
               closeMyRecordings={this.closeMyRecordings}
               recordingActionRoomname={this.state.panelActionRoomname}
               recordingUsername={this.props.username}
+              panelRedirect={this.panelRedirect}
+              roomActionClose={this.roomActionClose}
             ></RecordingList> : ''
         }
 
@@ -1396,6 +1494,10 @@ deleteParticipant = (r) => {
             <ChatList
               closeMyChats={this.closeMyChats}
               chatActionRoomname={this.state.panelActionRoomname}
+              panelRedirect={this.panelRedirect}
+            roomActionClose={this.roomActionClose}
+           
+
             ></ChatList> : ''
         }
 
@@ -1407,6 +1509,8 @@ deleteParticipant = (r) => {
 
               closeMyHistory={this.closeMyHistory}
               historyActionRoomname={this.state.panelActionRoomname}
+              panelRedirect={this.panelRedirect}
+              roomActionClose={this.roomActionClose}
 
             ></HistoryList> : ''
         }

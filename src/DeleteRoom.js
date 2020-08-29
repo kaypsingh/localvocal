@@ -64,7 +64,7 @@ class DeleteRoom extends React.Component {
 
                 <div className="popBoxInner">
                     <div className="popBoxHeader" id="dvDeleteMessageTitle">
-                        <h5>
+                        <h5 style={{fontSize: 18, color:'black'}}>
                             <span>Confirm Delete</span>
                         </h5>
                     </div>

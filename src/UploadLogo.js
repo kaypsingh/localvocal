@@ -15,23 +15,51 @@ class UploadLogo extends React.Component {
 
 
 
+    getLogoLogic = () => {
+
+        axios.post('https://api.videomeet.in/v2/conference.php/getlogo', qs.stringify({
+
+            authkey: 'M2atKiuCGKOo9Mj3',
+
+            roomname: this.props.logoActionRoomname,
+
+        }), {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            "Access-Control-Allow-Origin": "*",
+        }
+
+        )
+            .then((response) => {
+
+                console.log(response)
+
+            },
+                (error) => {
+                    console.log(error)
+                }
+            )
+
+
+    }
 
 
     componentDidMount() {
+
+        this.getLogoLogic()
 
     }
 
     render() {
 
-
+        console.log('logo pop')
         return (
             <>
 
                 <div className="popBoxInner">
 
                     <div className="popBoxHeader" id="dvSetDocumentTitle">
-                        <h5>
-        <span>Add logo in meeting {}</span>
+                        <h5 style={{fontSize: 18, color:'black'}}>
+                            <span>Add logo in meeting {}</span>
                         </h5>
                     </div>
 
@@ -52,7 +80,7 @@ class UploadLogo extends React.Component {
                                                     <span>Click to Upload File</span>
                                                 </label>
 
-                                                <input id="addfile-input" names="files[]" type="file" style={{display: 'none'}}></input>
+                                                <input id="addfile-input" names="files[]" type="file" style={{ display: 'none' }}></input>
                                             </form>
                                         </div>
                                     </td>

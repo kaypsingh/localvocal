@@ -35,7 +35,7 @@ class App extends React.Component {
 
 
   logoutLogic = () => {
-    this.setState({login: 0, meetingbox: 0, name: ''})
+    this.setState({login: 0, meetingbox: 0, name: '' })
   }
 
   newMeetingDialog = () => {
@@ -292,6 +292,8 @@ class App extends React.Component {
           createPopup={this.state.createPopup}
           onSaveAddMeating={this.onSaveAddMeating}
           scheduleButton={this.scheduleButton}
+
+          logoutLogic={this.logoutLogic}
 
         ></LoginMeeting>
 

@@ -66,7 +66,8 @@ class ChatList extends React.Component {
 
                 console.log(response)
 
-                alert(response.data.msg)
+              
+                this.props.roomActionClose()
 
                 // this.setState({documentMessage: response.data.msg})
                 this.setState({ chatMessage: response.data.msg, chatData: response.data.data })
@@ -100,7 +101,7 @@ class ChatList extends React.Component {
 
                         <div className="popBoxHeader" id="dvListOfMyChatTitle">
 
-                            <h5>
+                            <h5 style={{fontSize: 18, color:'black', textAlign:'left'}}>
                                 <span>List of Chat file(s) in {this.props.chatActionRoomname}</span>
                             </h5>
                         </div>
@@ -220,7 +221,7 @@ class ChatList extends React.Component {
                         <div className="popBoxFooter">
                             <span id="spnHideMyChat">
 
-                                <button className="cancelButton" onClick={this.props.closeMyChats} >
+                                <button className="cancelButton" onClick={()=>{this.props.closeMyChats();this.props.panelRedirect()}} >
                                     <span>Close</span>
                                 </button>
                             </span>

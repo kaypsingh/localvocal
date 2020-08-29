@@ -7653,7 +7653,7 @@ a.deep-linking-mobile__href {
 .popBoxFooter{display:block; width:100%; box-sizing:border-box;  margin-top:15px; padding-top:20px; /* border-top:1px solid #cfe0eb; */}
 .tableBox{border:1px solid #cfe0eb; padding:0px; margin:0px; border-collapse: collapse; margin-bottom:20px;}
 .tableBox th{background:#e6f3fb; font-weight:bold; border-bottom:1px solid #cfe0eb;  border-left:1px solid #cfe0eb; padding:10px 15px; font-size:14px; text-align:left; color:#333333 !important;}
-.tableBox td{border-bottom:1px solid #cfe0eb; border-left:1px solid #cfe0eb; padding:10px 15px; font-size:13px; text-align:left; color:#333333 !important;}
+.tableBox td{border-bottom:1px solid #cfe0eb; border-left:1px solid #cfe0eb; padding:10px 14px; font-size:13px; text-align:left; color:#333333 !important;}
 .tableBox td a{font-size:12px; color:#ff6d0c; text-decoration:none;}
 .tableBox td:last-child{width:90px;}
 .tableBox th:first-child, .tableBox td:first-child{border-left:none;}
@@ -8823,3 +8823,17 @@ line-height:44px;
 #cmbAudioVideo {
 	height: 30px;
 }
+
+.popBoxInner{width:780px!important; height:auto!important; padding-left:20px!important; padding-right:20px!important; top:90px!important; transform:translate(-50%, 0%)!important;}
+
+#dvDeleteMessage .popBoxInner, #dvBackgroundImage .popBoxInner, #dvAddDocumentLogo .popBoxInner, #dvAddDocument .popBoxInner, #dvAuthenticateUser .popBoxInner, #dvForgotPassword .popBoxInner{width:450px!important; height:auto!important; top:50%!important; transform:translate(-50%, -50%)!important;}
+
+#dvListParticipant #dvListParticipantTable #tblListParticipant th:nth-child(1){width:17%!important;}
+#dvListParticipant #dvListParticipantTable #tblListParticipant th:nth-child(2){width:22%!important;}
+#dvListParticipant #dvListParticipantTable #tblListParticipant th:nth-child(3){width:9%!important;}
+#dvListParticipant #dvListParticipantTable #tblListParticipant th:nth-child(4){width:15%!important;}
+#dvListParticipant #dvListParticipantTable #tblListParticipant th:nth-child(5){width:14%!important;}
+#dvListParticipant #dvListParticipantTable #tblListParticipant th:nth-child(6){width:7%!important;}
+
+
+

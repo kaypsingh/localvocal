@@ -112,13 +112,13 @@ class ShareDetails extends React.Component {
 
                 <div className="popBoxInner">
                     <div className="popBoxHeader">
-                        <h5>
+                        <h5 style={{fontSize: 18, color:'black'}}>
                             <span>Copy and Share to Invite</span>
                         </h5>
                     </div>
 
                     <div className="popBoxBody" id="dvShareDetailBody">
-                        <h5>
+                        <h5 style={{fontSize: 18, color:'black'}}>
                             <span>
                                 <strong> {this.props.bc}  is inviting you to a scheduled VideoMeet.</strong>
                             </span>

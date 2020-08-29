@@ -16,6 +16,7 @@ class Panelist extends React.Component {
             panelData: [],
             participantListDisplay: 0,
             clickedSave: 0 ,
+            resetValue: 0
             // hidePanel: 0
 
         }
@@ -100,6 +101,9 @@ else{
                 console.log(response)
              
                if(response.data.msg === "participants list fetched successfully"){
+
+              
+
                 var responsePanel = response.data.data
                    this.setState({participantListDisplay: 1 , panelData: responsePanel})
                } else{
@@ -137,6 +141,14 @@ else{
         this.setState({ ishost: !this.state.ishost })
     }
 
+     resetAddPenalist = () => {
+      this.setState({ participantName: '' ,participantEmail: '' ,participantCode: '' , ishost: false})
+
+    
+    // document.getElementById("create-course-form").reset();
+  
+    }
+
     // hidePanelPopup = () => {
     //     this.setState({ hidePanel: 1})
     // }
@@ -151,12 +163,12 @@ else{
 
         return (
             <>
-                <div id="dvAddPenalist" className="popBox" >
+                <div id="dvAddPenalist" className="popBox"  >
                 {/* display: this.state.hidePanel === 0 ? 'block' : 'none' */}
 
                     <div className="popBoxInner">
                         <div className="popBoxHeader" id="dvSetTitlePenalist">
-                            <h5>
+                            <h5 style={{fontSize: 18, color:'black', textAlign:'left'}}>
                                 <span>Add Panelist in {this.props.meetingRoomName} </span>
                             </h5>
 
@@ -173,7 +185,11 @@ else{
                                         </td>
 
                                         <td colSpan="3">
-                                            <input type="text" maxLength="50" className="textBox" id="txtPenalistName" placeholder="Name" onChange={this.handleParticipantName}></input>
+                                            <input type="text" maxLength="50" className="textBox" id="txtPenalistName" 
+                                            // placeholder="Name" 
+                                            value={this.state.participantName}
+                                            onClick={this.handleParticipantCode}
+                                             onChange={this.handleParticipantName}></input>
                                         </td>
                                     </tr>
 
@@ -185,7 +201,10 @@ else{
                                         </td>
 
                                         <td colSpan="3">
-                                            <input type="email" maxLength="100" className="textBox" placeholder="Email-Address" onChange={this.handleParticipantEmail}></input>
+                                            <input type="email" maxLength="100" className="textBox"
+                                            //  placeholder= "Email-Address:" 
+                                            value={this.state.participantEmail}
+                                              onChange={this.handleParticipantEmail}></input>
                                         </td>
 
                                     </tr>
@@ -200,7 +219,9 @@ else{
 
 
                                         <td style={{ "width": "40%" }}>
-                                            <input type="text" className="textBox" placeholder={this.state.participantCode} onClick={this.handleParticipantCode} id="txtPenalistCode"></input>
+                                            <input type="text" className="textBox" placeholder={this.state.participantCode} 
+                                            
+                                            id="txtPenalistCode"></input>
                                         </td>
 
 
@@ -232,7 +253,7 @@ else{
                             <span id="spnCopyShare">
 
                              
-                                <button className="cancelButton" onClick={()=>{this.props.closePanel();this.props.newMeetingClose();this.props.openSchedulePopup()}}>
+                                <button className="cancelButton" onClick={()=>{this.props.closePanel();this.props.newMeetingClose();this.props.openSchedulePopup(); this.props.scheduleApi();this.resetAddPenalist()}}>
                               
                                     <span>close</span>
                                 </button>
@@ -241,7 +262,7 @@ else{
 
 
 
-                                <button onClick={this.addParticipant} >
+                                <button onClick={()=>{this.addParticipant();this.resetAddPenalist()}} >
                                     <span>Save</span>
                                 </button>
                             </span>

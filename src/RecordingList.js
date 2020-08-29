@@ -46,6 +46,7 @@ class RecordingList extends React.Component {
 
 
     deleteRecording = (rid , rpath , rname) => {
+        console.log(rid)
 
         axios.post('https://api.videomeet.in/v2/conference_recording.php/deleterecording', qs.stringify({
 
@@ -97,7 +98,7 @@ class RecordingList extends React.Component {
 
             authkey: 'M2atKiuCGKOo9Mj3',
             // roomname: 'javateam',
-            roomname: this.props.recordingActionRoomname,
+           roomname: this.props.recordingActionRoomname,
 
         }), {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -108,6 +109,8 @@ class RecordingList extends React.Component {
             .then((response) => {
 
                 console.log(response)
+                this.props.roomActionClose()
+
 
                 this.setState({ recordingMessage: response.data.msg, recordingData: response.data.data })
 
@@ -140,7 +143,7 @@ class RecordingList extends React.Component {
 
                         <div className="popBoxHeader" id="dvListOfMyRecordingTitle">
 
-                            <h5>
+                            <h5 style={{fontSize: 18, color:'black', textAlign:'left'}}>
                                 <span>List of Recording file(s) in {this.props.recordingActionRoomname}</span>
                             </h5>
                         </div>
@@ -249,7 +252,7 @@ class RecordingList extends React.Component {
                         <div className="popBoxFooter">
                             <span id="spnHideMyRecording">
 
-                                <button className="cancelButton" onClick={this.props.closeMyRecordings} >
+                                <button className="cancelButton" onClick={()=>{this.props.closeMyRecordings();this.props.panelRedirect()}} >
                                     <span>Close</span>
                                 </button>
                             </span>

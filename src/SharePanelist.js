@@ -35,7 +35,7 @@ console.log(secRes)
 
                 <div className="popBoxInner">
                     <div className="popBoxHeader">
-                        <h5>
+                        <h5 style={{fontSize: 18, color:'black'}}>
                             <span>Copy and Share to Invite</span>
                         </h5>
                     </div>

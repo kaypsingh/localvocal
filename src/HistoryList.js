@@ -127,7 +127,8 @@ class HistoryList extends React.Component {
 
                 console.log(response.data.status)
 
-                alert(response.data.msg)
+                this.props.roomActionClose()
+
 
                 console.log(response)
 
@@ -167,7 +168,7 @@ class HistoryList extends React.Component {
 
                     <div className="popBoxInner">
                         <div className="popBoxHeader" id="dvRoomHistoryDetailsTitle" >
-                            <h5>
+                            <h5 style={{fontSize: 18, color:'black', textAlign:'left'}}>
                                 <span>History Report - {this.props.historyActionRoomname}</span>
                             </h5>
                         </div>
@@ -321,7 +322,7 @@ class HistoryList extends React.Component {
                         <div className="popBoxFooter">
                             <span id="spnRoomHistoryDetails">
 
-                                <button className="cancelButton" onClick={this.props.closeMyHistory}>
+                                <button className="cancelButton" onClick={()=>{this.props.closeMyHistory();this.props.panelRedirect()}}>
                                     <span>Close</span>
                                 </button>
                             </span>
