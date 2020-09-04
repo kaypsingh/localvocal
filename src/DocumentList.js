@@ -16,11 +16,12 @@ class DocumentList extends React.Component {
     deletingDocument = (d) => {
         console.log(d)
 
-        axios.post('https://api.videomeet.in/v2/conference.php/deletefile', qs.stringify ({ 
+
+        var path = "fileinfo="+d;
+
+        axios.post('https://api.videomeet.in/v3/conference.php/deletefile', path
         
-            fileinfo: d
-       
-        })
+          
         , {
 
            'Content-Type': 'application/x-www-form-urlencoded',
@@ -32,6 +33,9 @@ class DocumentList extends React.Component {
             .then((response) => {
         
               console.log(response)
+
+              
+              response.data =  this.props.changeResponse(response.data)
 
               alert(response.data.msg)
 
@@ -63,7 +67,7 @@ class DocumentList extends React.Component {
 
         return (
             <>
-                <div id="dvListOfDocuments" className="popBox" style={{ display: 'block', zIndex: 999 }}>
+                <div id="dvListOfDocuments" className="popBox" style={{ display: this.props.documentMessage === '' ? 'none' : 'block', zIndex: 999 }}>
 
                     <div className="popBoxInner">
 
@@ -81,10 +85,10 @@ class DocumentList extends React.Component {
 
 
 
-                                <span onClick={this.props.uploadLogo} style={{ color: '#3572b0' }}>Logo {" | "}</span>
+                                <span onClick={() => {this.props.uploadLogo()}} style={{ color: '#3572b0' }}>Logo {" | "}</span>
 
 
-                                <span onClick={this.props.uploadBackground} style={{ color: '#3572b0' }}>Background</span>
+                                <span onClick={() => {this.props.uploadBackground()}} style={{ color: '#3572b0' }}>Background</span>
 
 
                             </span>

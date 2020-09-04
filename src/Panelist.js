@@ -44,19 +44,20 @@ else{
         }
 
 
-        axios.post('https://api.videomeet.in/v2/participants.php/add', qs.stringify({
+        var conferenceId = this.props.conferId
+        var penalistName = this.state.participantName
+      var penalistEmailAddress = this.state.participantEmail
+        var txtPenalistCode = this.state.participantCode
+        var ispanelist = this.state.ispanelist
+        var makeCoHost = addPar
 
-            authkey: 'M2atKiuCGKOo9Mj3',
-            conferenceid: this.props.conferId,
-            name: this.state.participantName,
-            emailid: this.state.participantEmail,
-            code: this.state.participantCode,
-            ispanelist: this.state.ispanelist,
-            ishost: addPar
-          
+     
+        var path = "authkey=M2atKiuCGKOo9Mj3&conferenceid="+conferenceId+"&name="+penalistName+"&emailid="+penalistEmailAddress+"&code="+txtPenalistCode+"&ispanelist="+ispanelist+"&ishost="+makeCoHost;
+        path = this.props.getFormData(path);
 
+        axios.post('https://api.videomeet.in/v3/participants.php/add', path
 
-        }), {
+           , {
             'Content-Type': 'application/x-www-form-urlencoded',
             "Access-Control-Allow-Origin": "*",
         }
@@ -64,6 +65,8 @@ else{
         )
             .then((response) => {
                 console.log(response)
+
+                response.data =  this.props.changeResponse(response.data)
                 alert(response.data.msg)
 
                 if(response.data.msg === "Participant added successfully"){
@@ -84,13 +87,17 @@ else{
 
     // it checks for the any participant if present ( comes automatically no need to click !)
     fetchResult = () => {
-        axios.post('https://api.videomeet.in/v2/participants.php/participantlist', qs.stringify({
 
-            authkey: 'M2atKiuCGKOo9Mj3',
-            conferenceid: this.props.conferId
+        var conferenceId = this.props.conferId
+      
 
+        var path = "authkey=M2atKiuCGKOo9Mj3&conferenceid="+conferenceId;
 
-        }), {
+        path = this.props.getFormData(path);
+
+        axios.post('https://api.videomeet.in/v3/participants.php/participantlist', path
+
+      , {
             'Content-Type': 'application/x-www-form-urlencoded',
             "Access-Control-Allow-Origin": "*",
         }
@@ -99,6 +106,8 @@ else{
             .then((response) => {
 
                 console.log(response)
+
+                response.data =  this.props.changeResponse(response.data)
              
                if(response.data.msg === "participants list fetched successfully"){
 

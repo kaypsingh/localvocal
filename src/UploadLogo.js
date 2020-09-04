@@ -9,10 +9,49 @@ class UploadLogo extends React.Component {
         super(props)
         this.state = {
 
-
+            selectedLogo: ''
         }
     }
 
+    handleInputChange = (event) => {
+        console.log(event.target.files[0])
+        this.setState({
+            selectedLogo: event.target.files[0],
+        })
+    }
+
+
+    uploadingLogo = () => {
+
+        var formData = new FormData();
+        formData.append("roomname", this.props.logoActionRoomname);
+        formData.append("username", 'kpkpkp');
+        formData.append("image", this.state.selectedLogo);
+
+
+        axios.post('https://bridge01.videomeet.in/fileupload.php', formData, {
+
+
+            'content-type': 'multipart/form-data',
+            "Access-Control-Allow-Origin": "*"
+
+        }
+
+        )
+            .then((response) => {
+
+
+
+            },
+                (error) => {
+                    console.log(error)
+                }
+            )
+
+
+
+
+    }
 
 
     getLogoLogic = () => {
@@ -25,7 +64,7 @@ class UploadLogo extends React.Component {
 
         }), {
             'Content-Type': 'application/x-www-form-urlencoded',
-            "Access-Control-Allow-Origin": "*",
+            'Access-Control-Allow-Origin': '*',
         }
 
         )
@@ -51,14 +90,16 @@ class UploadLogo extends React.Component {
 
     render() {
 
-        console.log('logo pop')
+      
         return (
             <>
+
+<div id="dvAddDocumentLogo" className="popBox"  >
 
                 <div className="popBoxInner">
 
                     <div className="popBoxHeader" id="dvSetDocumentTitle">
-                        <h5 style={{fontSize: 18, color:'black'}}>
+                        <h5 style={{ fontSize: 18, color: 'black' }}>
                             <span>Add logo in meeting {}</span>
                         </h5>
                     </div>
@@ -76,11 +117,12 @@ class UploadLogo extends React.Component {
                                     <td style={{ "width": "70%" }}>
                                         <div className="cstomFile">
                                             <form id="filecatcher1">
-                                                <label for="addfile-input" className="custom-file-upload fileBtn">
-                                                    <span>Click to Upload File</span>
-                                                </label>
 
-                                                <input id="addfile-input" names="files[]" type="file" style={{ display: 'none' }}></input>
+                                                {/* <label for="addfile-input" className="custom-file-upload fileBtn">
+                                                    <span>Click to Upload File</span>
+                                                </label> */}
+
+                                                <input id="addfile-input" names="files[]" type="file" style={{ display: '' }}></input>
                                             </form>
                                         </div>
                                     </td>
@@ -104,13 +146,15 @@ class UploadLogo extends React.Component {
                                 <span>Close</span>
                             </button>
 
-                            <button>
+                            <button onClick={this.uploadingLogo}>
                                 <span>Add</span>
                             </button>
 
                         </span>
                     </div>
 
+
+                </div>
 
                 </div>
 

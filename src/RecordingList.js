@@ -48,13 +48,14 @@ class RecordingList extends React.Component {
     deleteRecording = (rid , rpath , rname) => {
         console.log(rid)
 
-        axios.post('https://api.videomeet.in/v2/conference_recording.php/deleterecording', qs.stringify({
+        var recordingId = rid
 
-         
-            d: rid,
-         
+        var path = "d="+recordingId;
+		path = this.props.getFormData(path);
 
-        }), {
+        axios.post('https://api.videomeet.in/v3/conference_recording.php/deleterecording', path
+
+       , {
             'Content-Type': 'application/x-www-form-urlencoded',
             "Access-Control-Allow-Origin": "*",
         }
@@ -63,6 +64,8 @@ class RecordingList extends React.Component {
             .then((response) => {
 
                 console.log(response)
+
+                response.data =  this.props.changeResponse(response.data)
 
               
 
@@ -94,13 +97,15 @@ class RecordingList extends React.Component {
 
 
     fetchRecordingsResult = () => {
-        axios.post('https://api.videomeet.in/v2/conference_recording.php/recordinglist', qs.stringify({
 
-            authkey: 'M2atKiuCGKOo9Mj3',
-            // roomname: 'javateam',
-           roomname: this.props.recordingActionRoomname,
+        var roomname = this.props.recordingActionRoomname
 
-        }), {
+        var path = "authkey=M2atKiuCGKOo9Mj3&roomname="+roomname;
+		path = this.props.getFormData(path);
+
+        axios.post('https://api.videomeet.in/v3/conference_recording.php/recordinglist', path
+
+        , {
             'Content-Type': 'application/x-www-form-urlencoded',
             "Access-Control-Allow-Origin": "*",
         }
@@ -109,6 +114,9 @@ class RecordingList extends React.Component {
             .then((response) => {
 
                 console.log(response)
+
+                response.data =  this.props.changeResponse(response.data)
+
                 this.props.roomActionClose()
 
 

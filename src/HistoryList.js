@@ -1,10 +1,9 @@
 import React from 'react';
 import qs from 'qs'
 import axios from 'axios';
+import "flatpickr/dist/themes/material_green.css";
 
-// import "flatpickr/dist/themes/material_green.css";
-
-// import Flatpickr from "react-flatpickr";
+import Flatpickr from "react-flatpickr";
 
 
 class HistoryList extends React.Component {
@@ -20,8 +19,13 @@ class HistoryList extends React.Component {
             changeToDate: 0,
             historyRes: [],
             dataMsg: '',
-            statusHistory: ''
+            statusHistory: '',
+            someFdate: new Date(),
+            someTdate: new Date(),
 
+            tf: '',
+            tt: '',
+            defaultDate: ''
 
 
 
@@ -29,103 +33,111 @@ class HistoryList extends React.Component {
     }
 
 
-    handleFromDate = (event) => {
-        console.log(event.target.value)
-        this.setState({ meetingFromDate: event.target.value, changeFromDate: 1 })
+    timeFrom = (today) => {
+
+        let d = new Date(today);
+        let oneDayFromNow = d.setDate(d.getDate() + 1);
+        oneDayFromNow = new Date(oneDayFromNow).toISOString().slice(0, 10);
+        console.log(oneDayFromNow)
+
+        this.setState({ tf: oneDayFromNow })
+
     }
 
-    handleToDate = (event) => {
-        console.log(event.target.value)
-        this.setState({ meetingToDate: event.target.value, changeToDate: 1 })
+
+    timeTo = (today) => {
+
+        let d = new Date(today);
+        let oneDayNow = d.setDate(d.getDate() + 1);
+        oneDayNow = new Date(oneDayNow).toISOString().slice(0, 10);
+        console.log(oneDayNow)
+
+        this.setState({ tt: oneDayNow })
+
     }
 
+    timeToday = () => {
+        let f = new Date();
+        let od = f.setDate(f.getDate());
+        od = new Date(od).toISOString().slice(0, 10);
+        console.log(od)
+
+        this.setState({ defaultDate: od }, () => { console.log(this.state.defaultDate) })
+
+
+    }
 
 
     fetchHistoryResult = () => {
 
-        console.log(this.state.meetingFromDate)
-        console.log(this.state.meetingToDate)
+        if (this.state.defaultDate !== '') {
 
-        if (this.state.meetingFromDate === '' && this.state.meetingToDate === '') {
-            var t = new Date();
-            var d = String(t.getDate()).padStart(2, '0');
-            var m = String(t.getMonth() + 1).padStart(2, '0'); //January is 0!
-            var y = t.getFullYear();
+            if (this.state.tf === '' && this.state.tt === '') {
+                console.log('hijihih')
 
-            var z = d + '-' + m + '-' + y;
+                var apiFromDate = this.state.defaultDate
+                var apiToDate = this.state.defaultDate
+
+            }
+
+            else if (this.state.tf === '' && this.state.tt !== '') {
+
+                var apiFromDate = this.state.defaultDate
+                var apiToDate = this.state.tt
+
+            }
+
+            else if (this.state.tf !== '' && this.state.tt === '') {
 
 
-            var apiFromDate = z.split("-")[2] + "-" + z.split("-")[1] + "-" + z.split("-")[0];
+                var apiFromDate = this.state.tf
+                var apiToDate = this.state.defaultDate
 
-            var apiToDate = z.split("-")[2] + "-" + z.split("-")[1] + "-" + z.split("-")[0];
 
-            console.log(apiFromDate)
+            }
+
+            else if (this.state.tf !== '' && this.state.tt !== '') {
+
+                var apiFromDate = this.state.tf
+                var apiToDate = this.state.tt
+
+            }
         }
 
-        else if (this.state.meetingFromDate === '' && this.state.meetingToDate !== '') {
 
-            var t = new Date();
-            var d = String(t.getDate()).padStart(2, '0');
-            var m = String(t.getMonth() + 1).padStart(2, '0'); //January is 0!
-            var y = t.getFullYear();
+        // default api call on the first time 
+        else if (this.state.defaultDate === '') {
 
-            var z = d + '-' + m + '-' + y;
+            let k = new Date();
+            let kn = k.setDate(k.getDate());
+            kn = new Date(kn).toISOString().slice(0, 10);
 
-            var h = this.state.meetingToDate
+            var apiFromDate = kn
+            var apiToDate = kn
 
-            var apiFromDate = z.split("-")[2] + "-" + z.split("-")[1] + "-" + z.split("-")[0];
-
-            var apiToDate = h.split("-")[2] + "-" + h.split("-")[1] + "-" + h.split("-")[0];
-
-        }
-
-        else if (this.state.meetingFromDate !== '' && this.state.meetingToDate === '') {
-            var z = this.state.meetingFromDate
-         
-            var apiFromDate = z.split("-")[2] + "-" + z.split("-")[1] + "-" + z.split("-")[0];
-
-            var t = new Date();
-            var d = String(t.getDate()).padStart(2, '0');
-            var m = String(t.getMonth() + 1).padStart(2, '0'); //January is 0!
-            var y = t.getFullYear();
-
-            var h = d + '-' + m + '-' + y;
-            var apiToDate = h.split("-")[2] + "-" + h.split("-")[1] + "-" + h.split("-")[0];
-          
-
-        }
-
-        else if (this.state.meetingFromDate !== '' && this.state.meetingToDate !== '') {
-
-            var z = this.state.meetingFromDate
-            var h = this.state.meetingToDate
-
-            var apiFromDate = z.split("-")[2] + "-" + z.split("-")[1] + "-" + z.split("-")[0];
-            console.log(apiFromDate)
-
-            var apiToDate = h.split("-")[2] + "-" + h.split("-")[1] + "-" + h.split("-")[0];
-            console.log(apiToDate)
 
 
         }
 
-        axios.post('https://api.videomeet.in/v2/room_history.php', qs.stringify({
+        var roomname = this.props.historyActionRoomname
 
-            authkey: 'M2atKiuCGKOo9Mj3',
-            roomname: this.props.historyActionRoomname,
-            // roomname: 'javateam',
-            fromdate: apiFromDate,
-            todate: apiToDate 
+        var path = "authkey=M2atKiuCGKOo9Mj3&roomname=" + roomname + "&fromdate=" + apiFromDate + "&todate=" + apiToDate;
+        path = this.props.getFormData(path);
 
-        }), {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            "Access-Control-Allow-Origin": "*",
-        }
+
+        axios.post('https://api.videomeet.in/v3/room_history.php', path
+
+            , {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                "Access-Control-Allow-Origin": "*",
+            }
 
         )
             .then((response) => {
 
                 console.log(response.data.status)
+
+                response.data = this.props.changeResponse(response.data)
 
                 this.props.roomActionClose()
 
@@ -145,6 +157,7 @@ class HistoryList extends React.Component {
 
 
     componentDidMount() {
+        this.timeToday()
         this.fetchHistoryResult()
 
     }
@@ -152,62 +165,50 @@ class HistoryList extends React.Component {
     render() {
 
         const { meetingDate } = this.state
+        const { someFdate } = this.state;
+        const { someTdate } = this.state;
 
         var today = new Date();
+      
         var dd = String(today.getDate()).padStart(2, '0');
         var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
         var yyyy = today.getFullYear();
 
         today = dd + '-' + mm + '-' + yyyy;
-        console.log(today)
 
         return (
             <>
 
-                <div id="dvRoomHistoryDetails" className="popBox" style={{ display: 'block', zIndex: 999 }}>
+                <div id="dvRoomHistoryDetails" className="popBox" style={{ display: this.state.dataMsg === '' ? 'none' : 'block', zIndex: 999 }}>
 
                     <div className="popBoxInner">
                         <div className="popBoxHeader" id="dvRoomHistoryDetailsTitle" >
-                            <h5 style={{fontSize: 18, color:'black', textAlign:'left'}}>
+                            <h5 style={{ fontSize: 18, color: 'black', textAlign: 'left' }}>
                                 <span>History Report - {this.props.historyActionRoomname}</span>
                             </h5>
                         </div>
 
                         <div className="popBoxBody">
                             <div>
-                                {/* <Flatpickr data-enable-time
-                                 options={{
-                                    dateFormat: 'd-m-Y',
-        
-                                    clickOpens: true,
-                                    defaultDate: null,
-                                    defaultHour: 12,
-                                    defaultMinute: 0,
-                                    minDate: null,
-                                    maxDate: null,
-                                    enableTime: false,
-                                    enableSeconds: false,
-                                    time_24hr: false,
-                                    noCalendar: false
-        
-                                  }}  */}
 
 
+                                <Flatpickr data-enable-time
 
-                                <input type="text" className="textBox flatpickr-input"
-                                    placeholder={today}
-                                    onChange={this.handleFromDate}
-                                    //     onChange={meetingDate => {
-                                    //         this.setState({ meetingDate }, () => { console.log(this.state.meetingDate) });
-                                    //     }
-                                    // }
-                                    id="txtHistoryFromDate"
-                                    style={{ color: 'black', width: 200 }} ></input>
+                                    options={{ dateFormat: 'd-m-Y', clickOpens: true, defaultDate: null, defaultHour: 12, defaultMinute: 0, minDate: null, maxDate: null, enableTime: false, enableSeconds: false, time_24hr: false, noCalendar: false }}
 
-                                <input type="text" className="textBox flatpickr-input"
-                                    placeholder={today}
-                                    onChange={this.handleToDate} id="txtHistoryToDate"
-                                    style={{ color: 'black', width: 200 }}></input>
+                                    style={{ width: 200 }} className="textBox flatpickr-input" id="txtMeetingDate" placeholder={today} onChange={someFdate => { this.setState({ someFdate }, () => { this.timeFrom(someFdate) }) }}
+
+                                ></Flatpickr>
+
+                                <Flatpickr data-enable-time
+
+                                    options={{ dateFormat: 'd-m-Y', clickOpens: true, defaultDate: null, defaultHour: 12, defaultMinute: 0, minDate: null, maxDate: null, enableTime: false, enableSeconds: false, time_24hr: false, noCalendar: false }}
+
+                                    style={{ width: 200 }} className="textBox flatpickr-input" id="txtHistoryToDate" placeholder={today} onChange={someTdate => { this.setState({ someTdate }, () => { this.timeTo(someTdate) }) }}
+
+                                ></Flatpickr>
+
+
 
                                 <span id="spnRoomHistorySearchBut">
                                     <button onClick={this.fetchHistoryResult}>
@@ -218,7 +219,7 @@ class HistoryList extends React.Component {
 
                             </div>
 
-                            <div id="dvRoomHistoryDetailsTable" style={{ overflowY: 'auto', overflowX: 'hidden' }}>
+                            <div id="dvRoomHistoryDetailsTable" style={{ overflowY: 'auto', overflowX: 'hidden', display: this.state.dataMsg === '' ? 'none' : '' }}>
                                 <table className="tableBox" id="tblRoomHistoryDetails" style={{ "width": "100%" }}>
                                     <tbody>
                                         <tr>
@@ -322,7 +323,7 @@ class HistoryList extends React.Component {
                         <div className="popBoxFooter">
                             <span id="spnRoomHistoryDetails">
 
-                                <button className="cancelButton" onClick={()=>{this.props.closeMyHistory();this.props.panelRedirect()}}>
+                                <button className="cancelButton" onClick={() => { this.props.closeMyHistory(); this.props.panelRedirect() }}>
                                     <span>Close</span>
                                 </button>
                             </span>

@@ -18,12 +18,13 @@ class ChatList extends React.Component {
 
     deleteChat = (cId) => {
 
-        axios.post('https://api.videomeet.in/v2/chat.php/deletechatfile', qs.stringify({
+        var chatId = cId
 
-            authkey: 'M2atKiuCGKOo9Mj3',
-            fileinfo: cId,
+        var path = "authkey=M2atKiuCGKOo9Mj3&fileinfo="+chatId;
+		path = this.props.getFormData(path);
 
-        }), {
+        axios.post('https://api.videomeet.in/v3/chat.php/deletechatfile', path 
+        , {
             'Content-Type': 'application/x-www-form-urlencoded',
             "Access-Control-Allow-Origin": "*",
         }
@@ -32,6 +33,8 @@ class ChatList extends React.Component {
             .then((response) => {
 
                 console.log(response)
+
+                response.data =  this.props.changeResponse(response.data)
 
                 alert(response.data.msg)
 
@@ -50,13 +53,16 @@ class ChatList extends React.Component {
 
 
     fetchChatResult = () => {
-        axios.post('https://api.videomeet.in/v2/chat.php/chatlist', qs.stringify({
 
-            authkey: 'M2atKiuCGKOo9Mj3',
-            roomname: 'javateam'
-            // roomname: this.props.chatActionRoomname,
+        var roomname = this.props.chatActionRoomname
 
-        }), {
+        var path = "authkey=M2atKiuCGKOo9Mj3&roomname="+roomname;
+
+        path = this.props.getFormData(path)
+
+        axios.post('https://api.videomeet.in/v3/chat.php/chatlist', path
+
+      , {
             'Content-Type': 'application/x-www-form-urlencoded',
             "Access-Control-Allow-Origin": "*",
         }
@@ -66,6 +72,7 @@ class ChatList extends React.Component {
 
                 console.log(response)
 
+                response.data =  this.props.changeResponse(response.data)
               
                 this.props.roomActionClose()
 

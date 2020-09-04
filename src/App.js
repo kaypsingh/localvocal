@@ -11,6 +11,9 @@ import RecordingList from './RecordingList'
 import ChatList from './ChatList';
 import HistoryList from './HistoryList.js';
 
+import sha256 from 'crypto-js/sha256';
+var CryptoJS = require("crypto-js");
+
 class App extends React.Component {
 
   constructor(props) {
@@ -29,9 +32,39 @@ class App extends React.Component {
       dataSource: [],
       parentData: '',
       dataEntry: '',
-      scheduleListDisplay: 0
+      scheduleListDisplay: 0,
+
+      mobile: '',
+      email: '',
+      key: '2e35f242a46d67eeb74aabc37d5e5d05',
+      fd: '',
+
+      CryptoJSAesJson: {
+        stringify: function (cipherParams) {
+          var j = {ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64)};
+          if (cipherParams.iv) j.iv = cipherParams.iv.toString();
+          if (cipherParams.salt) j.s = cipherParams.salt.toString();
+            return JSON.stringify(j);
+          },
+          parse: function (jsonStr) {
+          var j = JSON.parse(jsonStr);
+          var cipherParams = CryptoJS.lib.CipherParams.create({ciphertext: CryptoJS.enc.Base64.parse(j.ct)});
+          if (j.iv) cipherParams.iv = CryptoJS.enc.Hex.parse(j.iv)
+          if (j.s) cipherParams.salt = CryptoJS.enc.Hex.parse(j.s)
+            return cipherParams;
+          }
+
+      }
+
+      
+
     }
+
+
   }
+
+
+
 
 
   logoutLogic = () => {
@@ -60,7 +93,132 @@ class App extends React.Component {
 
 
 
+   parseForm = (formdata) => {
+
+
+
+    var CryptoJSAesJson = {
+      stringify: function (cipherParams) {
+      var j = {ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64)};
+      if (cipherParams.iv) j.iv = cipherParams.iv.toString();
+      if (cipherParams.salt) j.s = cipherParams.salt.toString();
+        return JSON.stringify(j);
+      },
+      parse: function (jsonStr) {
+      var j = JSON.parse(jsonStr);
+      var cipherParams = CryptoJS.lib.CipherParams.create({ciphertext: CryptoJS.enc.Base64.parse(j.ct)});
+      if (j.iv) cipherParams.iv = CryptoJS.enc.Hex.parse(j.iv)
+      if (j.s) cipherParams.salt = CryptoJS.enc.Hex.parse(j.s)
+        return cipherParams;
+      }
+    }
+
+
+
+
+		var secret = {};
+	
+		for(let [name, value] of formdata) {
+			if(secret[`${name}`]) {
+				if (!secret[`${name}`].push) {
+					secret[`${name}`] = [secret[`${name}`]];
+				}
+      var sarwan =	secret[`${name}`].push(`${value}` || '');
+   
+  
+			} else {
+        var sarwan =	secret[`${name}`] = `${value}` || '';
+      
+      }
+    
+    
+		}
+    
+ 
+    var encrypted =  CryptoJS.AES.encrypt(JSON.stringify(secret), this.state.key, {format: CryptoJSAesJson}).toString();
+  
+     encrypted = JSON.parse(encrypted);
+     encrypted = JSON.stringify(encrypted);
+     console.log(encrypted)
+
+     return encrypted
+
+	}
+
+
+  getFormData = (param) => {
+   
+    var arrParam = param.split("&");
+    var formData = new FormData();
+    for (var i = 0; i < arrParam.length; i++) {
+      formData.append(arrParam[i].split("=")[0].trim(), arrParam[i].split("=")[1].trim());
+    }
+  
+ return "formdata=" +encodeURIComponent(this.parseForm(formData));
+
+  }
+
+   getEncFormData = (param) => {
+		var arrParam = param.split("&");
+		var formData1 = new FormData();
+		for(var i=0; i<arrParam.length; i++) {
+			formData1.append(arrParam[i].split("=")[0].trim(), arrParam[i].split("=")[1].trim());
+		}
+		
+		return encodeURIComponent(this.parseForm(formData1));
+	}
+	
+
+
+
+
+  // handleEncryption = () => {
+
+  //   var u = 'kpkpkp'
+  //   var p = '288181832'
+  //   var path = "authkey=M2atKiuCGKOo9Mj3&username=" + u + "&password=" + p;
+
+  
+  // path = this.getFormData(path)
+  // console.log(path)
+
+  // if(path !== undefined ){
+  //   this.handleLogin(path)
+  // }
+
+
+
+  // }
+
+  changeResponse = (responseTEXT) => {
+
+    var fg = CryptoJS.AES.decrypt(JSON.stringify(responseTEXT),this.state.key,{format: this.state.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8)
+console.log(typeof(fg))
+
+return JSON.parse(fg)   }
+
+
+//    console.log(CryptoJS.AES.decrypt(JSON.stringify(responseTEXT),this.state.key,{format: this.state.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8) )
+
+
+
+// console.log(typeof(responseTEXT))
+  
+
+
+
+
+
   handleLogin = () => {
+
+    // var path = "authkey=M2atKiuCGKOo9Mj3&username="+username+"&password="+password;
+        // path = getFormData(path);
+        
+    var username = this.state.username
+    var password = this.state.password
+  	var path = "authkey=M2atKiuCGKOo9Mj3&username="+username+"&password="+password;
+    path = this.getFormData(path);
+
 
     if (this.state.username === '' && this.state.password === '') { alert('enter username and password') }
 
@@ -70,13 +228,8 @@ class App extends React.Component {
 
     else {
 
-      axios.post('https://api.videomeet.in/v2/authentication.php/', qs.stringify({
-
-        authkey: 'M2atKiuCGKOo9Mj3',
-        username: this.state.username,
-        password: this.state.password,
-
-      }), {
+    
+      axios.post('https://api.videomeet.in/v3/authentication.php/', path , {
         'Content-Type': 'application/x-www-form-urlencoded',
         "Access-Control-Allow-Origin": "*",
       }
@@ -84,10 +237,14 @@ class App extends React.Component {
       )
         .then((response) => {
           console.log(response)
+        
+          console.log(response.data)
+        
+        
+           response.data =  this.changeResponse(response.data)
 
           const loginCredentials = localStorage.getItem('added-credentials')
-          // console.log(loginCredentials.length)
-
+         
           const parsedrest = []
           parsedrest.push({ username: this.state.username, password: this.state.password })
 
@@ -103,7 +260,7 @@ class App extends React.Component {
 
            if(loginCredentials !== null)   {
 
-              this.setState({ login: 1  }, () => {this.getName(name)})
+              this.setState({ login: 1 , email: response.data.data.email, mobile: response.data.data.mobile }, () => {this.getName(name)})
 
            }else{
              
@@ -127,25 +284,25 @@ class App extends React.Component {
 
     }
 
-  }
 
+ 
 
+    }
 
-
-
+  
 
 
   scheduleApi = () => {
 
+    var username = this.state.username
+
+    var path = "authkey=M2atKiuCGKOo9Mj3&username="+username;
+				path = this.getFormData(path);
 
     this.setState({ createPopup: 0 })
-    axios.post('https://api.videomeet.in/v2/conference.php/confrencelist', qs.stringify({
+    axios.post('https://api.videomeet.in/v3/conference.php/confrencelist', path
 
-      authkey: 'M2atKiuCGKOo9Mj3',
-      username: this.state.username
-
-
-    }), {
+    , {
       'Content-Type': 'application/x-www-form-urlencoded',
       "Access-Control-Allow-Origin": "*",
     }
@@ -153,6 +310,9 @@ class App extends React.Component {
     )
       .then((response) => {
         console.log(response)
+
+        response.data =  this.changeResponse(response.data)
+
         console.log(response.data.msg)
 
         if (response.data.msg === "No record found") {
@@ -221,6 +381,8 @@ class App extends React.Component {
 
 
   componentDidMount() {
+
+ 
 
   }
 
@@ -294,6 +456,15 @@ class App extends React.Component {
           scheduleButton={this.scheduleButton}
 
           logoutLogic={this.logoutLogic}
+
+          email={this.state.email}
+          mobile={this.state.mobile}
+          password={this.state.password}
+
+          handleEncryption={this.handleEncryption}
+          getFormData={this.getFormData}
+          getEncFormData={this.getEncFormData}
+          changeResponse={this.changeResponse}
 
         ></LoginMeeting>
 

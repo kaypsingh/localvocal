@@ -27,7 +27,7 @@ class UploadDocument extends React.Component {
 
 
         var formData = new FormData();
-        formData.append("roomname", 'hanumangarh');
+        formData.append("roomname", this.props.panelActionRoomname);
         formData.append("authkey", 'M2atKiuCGKOo9Mj3');
         formData.append('image[]', this.state.selectedFile); 
 
@@ -98,9 +98,9 @@ class UploadDocument extends React.Component {
                                     <td style={{ "width": "70%" }}>
                                         <div className="cstomFile">
                                             <form id="filecatcher1">
-                                                <label for="addfile-input" className="custom-file-upload fileBtn" onChange={this.handleInputChange}>
+                                                {/* <label for="addfile-input"  className="custom-file-upload fileBtn" onChange={this.handleInputChange}>
                                                     <span>Click to Upload File</span>
-                                                </label>
+                                                </label> */}
 
                                              
                                              

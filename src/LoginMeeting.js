@@ -20,7 +20,7 @@ class LoginMeeting extends React.Component {
   handleForgotUsername = (event) => {
 
     var txtUserName = event.target.value
-    this.setState({forgotUsername: txtUserName } , () => {console.log(this.state.forgotUsername)})
+    this.setState({ forgotUsername: txtUserName }, () => { console.log(this.state.forgotUsername) })
   }
 
   forgotPwd = () => {
@@ -35,33 +35,39 @@ class LoginMeeting extends React.Component {
 
   handleForgotPwd = () => {
 
-this.state.forgotUsername !== "" ? 
+    var txtUserName = this.state.forgotUsername
 
-    axios.post('https://api.videomeet.in/v2/forgotpassword.php', qs.stringify({
+    var path = "authkey=M2atKiuCGKOo9Mj3&username="+txtUserName;
+			path = this.props.getFormData(path);
 
-      authkey: 'M2atKiuCGKOo9Mj3',
-      username: this.state.forgotUsername,
+    this.state.forgotUsername !== "" ?
     
 
-    }), {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      "Access-Control-Allow-Origin": "*",
-    }
+      axios.post('https://api.videomeet.in/v3/forgotpassword.php', path
 
-    )
-    .then((response) => {
-      console.log(response)
-      alert(response.data.msg)
-     
-      
-      },
-        (error) => {
-          console.log(error)
-        }
+
+      , {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        "Access-Control-Allow-Origin": "*",
+      }
+
       )
+        .then((response) => {
+          console.log(response)
+
+          response.data =  this.props.changeResponse(response.data)
+
+          alert(response.data.msg)
 
 
-: alert('invalid username')
+        },
+          (error) => {
+            console.log(error)
+          }
+        )
+
+
+      : alert('invalid username')
 
 
   }
@@ -111,7 +117,7 @@ this.state.forgotUsername !== "" ?
 
           </div>
 
- {/* forgot popup */}
+          {/* forgot popup */}
 
           <div className="popBox" id="dvForgotPassword" style={{ display: this.state.forgotPopup === 1 ? 'block' : 'none' }}>
 
@@ -126,7 +132,7 @@ this.state.forgotUsername !== "" ?
 
                 </input>
 
-            
+
               </div>
 
               <div className="popBoxFooter">
@@ -155,12 +161,20 @@ this.state.forgotUsername !== "" ?
 
             newMeetingDialog={this.props.newMeetingDialog}
             newMeetingClose={this.props.newMeetingClose}
-          
+
             createPopup={this.props.createPopup}
             onSaveAddMeating={this.props.onSaveAddMeating}
             scheduleButton={this.props.scheduleButton}
 
             logoutLogic={this.props.logoutLogic}
+
+            email={this.props.email}
+            mobile={this.props.mobile}
+            password={this.props.password}
+
+            getFormData={this.props.getFormData}
+            getEncFormData={this.props.getEncFormData}
+            changeResponse={this.props.changeResponse}
           >
 
           </ScheduleMeetinglist>

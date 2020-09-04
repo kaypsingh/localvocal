@@ -16,13 +16,16 @@ class ShareDetails extends React.Component {
 
     fetchParticipants = () => {
 
+        var conferenceId = this.props.shareConId
+      
 
-        axios.post('https://api.videomeet.in/v2/participants.php/participantlist', qs.stringify({
+        var path = "authkey=M2atKiuCGKOo9Mj3&conferenceid="+conferenceId;
+    
+        path = this.props.getFormData(path);
 
-            authkey: 'M2atKiuCGKOo9Mj3',
-            conferenceid: this.props.shareConId
 
-        }), {
+        axios.post('https://api.videomeet.in/v3/participants.php/participantlist', path
+        , {
             'Content-Type': 'application/x-www-form-urlencoded',
             "Access-Control-Allow-Origin": "*",
         }
@@ -31,6 +34,8 @@ class ShareDetails extends React.Component {
             .then((response) => {
 
                 console.log(response.data.msg)
+
+                response.data =  this.props.changeResponse(response.data)
 
                console.log(response)
 

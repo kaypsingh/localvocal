@@ -1,499 +1,463 @@
-/* global interfaceConfig */
-
 import React from 'react';
+import './App.css';
+import './allstyle.css';
+import qs from 'qs';
+import axios from 'axios';
+import LoginMeeting from './LoginMeeting'
+import ScheduleMeetinglist from './ScheduleMeetinglist'
+import Panelist from './Panelist'
+import DocumentList from './DocumentList'
+import RecordingList from './RecordingList'
+import ChatList from './ChatList';
+import HistoryList from './HistoryList.js';
 
-import { isMobileBrowser } from '../../base/environment/utils';
-import { translate, translateToHTML } from '../../base/i18n';
-import { Icon, IconWarning } from '../../base/icons';
-import { Watermarks } from '../../base/react';
-import { connect } from '../../base/redux';
-import { CalendarList } from '../../calendar-sync';
-import { RecentList } from '../../recent-list';
-import { SettingsButton, SETTINGS_TABS } from '../../settings';
+import sha256 from 'crypto-js/sha256';
+var CryptoJS = require("crypto-js");
 
-import { AbstractWelcomePage, _mapStateToProps } from './AbstractWelcomePage';
-import Tabs from './Tabs';
+class App extends React.Component {
 
-// import LoginMeeting from './LoginMeeting'
+  constructor(props) {
+    super(props)
+    this.state = {
 
-// import './WelcomePage.css'
+      createPopup: 0,
+      meetingbox: 0,
+      cancelButton: 0,
+      name: '',
+      username: '',
+      password: '',
+      loginCredentials: [],
+     
+      login: 0,
+      dataSource: [],
+      parentData: '',
+      dataEntry: '',
+      scheduleListDisplay: 0,
 
-/**
- * The pattern used to validate room name.
- * @type {string}
- */
-export const ROOM_NAME_VALIDATE_PATTERN_STR = '^[^?&:\u0022\u0027%#]+$';
+      mobile: '',
+      email: '',
+      key: '2e35f242a46d67eeb74aabc37d5e5d05',
+      fd: '',
 
-/**
- * Maximum number of pixels corresponding to a mobile layout.
- * @type {number}
- */
-const WINDOW_WIDTH_THRESHOLD = 425;
+      CryptoJSAesJson: {
+        stringify: function (cipherParams) {
+          var j = {ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64)};
+          if (cipherParams.iv) j.iv = cipherParams.iv.toString();
+          if (cipherParams.salt) j.s = cipherParams.salt.toString();
+            return JSON.stringify(j);
+          },
+          parse: function (jsonStr) {
+          var j = JSON.parse(jsonStr);
+          var cipherParams = CryptoJS.lib.CipherParams.create({ciphertext: CryptoJS.enc.Base64.parse(j.ct)});
+          if (j.iv) cipherParams.iv = CryptoJS.enc.Hex.parse(j.iv)
+          if (j.s) cipherParams.salt = CryptoJS.enc.Hex.parse(j.s)
+            return cipherParams;
+          }
 
-/**
- * The Web container rendering the welcome page.
- *
- * @extends AbstractWelcomePage
- */
-class WelcomePage extends AbstractWelcomePage {
-    /**
-     * Default values for {@code WelcomePage} component's properties.
-     *
-     * @static
-     */
-    static defaultProps = {
-        _room: ''
-    };
-
-    /**
-     * Initializes a new WelcomePage instance.
-     *
-     * @param {Object} props - The read-only properties with which the new
-     * instance is to be initialized.
-     */
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            ...this.state,
-
-            generateRoomnames:
-                interfaceConfig.GENERATE_ROOMNAMES_ON_WELCOME_PAGE,
-            selectedTab: 0,
-
-            meetingbox: 0,
-            cancelButton: 0
-        };
-
-        /**
-         * The HTML Element used as the container for additional content. Used
-         * for directly appending the additional content template to the dom.
-         *
-         * @private
-         * @type {HTMLTemplateElement|null}
-         */
-        this._additionalContentRef = null;
-
-        this._roomInputRef = null;
-
-        /**
-         * The HTML Element used as the container for additional toolbar content. Used
-         * for directly appending the additional content template to the dom.
-         *
-         * @private
-         * @type {HTMLTemplateElement|null}
-         */
-        this._additionalToolbarContentRef = null;
-
-        /**
-         * The template to use as the main content for the welcome page. If
-         * not found then only the welcome page head will display.
-         *
-         * @private
-         * @type {HTMLTemplateElement|null}
-         */
-        this._additionalContentTemplate = document.getElementById(
-            'welcome-page-additional-content-template');
-
-        /**
-         * The template to use as the additional content for the welcome page header toolbar.
-         * If not found then only the settings icon will be displayed.
-         *
-         * @private
-         * @type {HTMLTemplateElement|null}
-         */
-        this._additionalToolbarContentTemplate = document.getElementById(
-            'settings-toolbar-additional-content-template'
-        );
-
-        // Bind event handlers so they are only bound once per instance.
-        this._onFormSubmit = this._onFormSubmit.bind(this);
-        this._onRoomChange = this._onRoomChange.bind(this);
-        this._setAdditionalContentRef
-            = this._setAdditionalContentRef.bind(this);
-        this._setRoomInputRef = this._setRoomInputRef.bind(this);
-        this._setAdditionalToolbarContentRef
-            = this._setAdditionalToolbarContentRef.bind(this);
-        this._onTabSelected = this._onTabSelected.bind(this);
-    }
-
-
-    scheduleMeet = () => {
-       this.setState({ meetingbox: 1 })
-    
       }
 
-      loginSuccessful = () => {
-        console.log('ho gay')
-        }
-        
-          cancelBtn = () => {
-            this.setState({ cancelButton: 1, meetingbox: 0 })
-            console.log('ll')
-          }
-        
-          scheduleMeet = () => {
-            this.setState({ meetingbox: 1 })
-        
-          }
-        
+      
 
-    /**
-     * Implements React's {@link Component#componentDidMount()}. Invoked
-     * immediately after this component is mounted.
-     *
-     * @inheritdoc
-     * @returns {void}
-     */
-    componentDidMount() {
-        super.componentDidMount();
-
-        document.body.classList.add('welcome-page');
-        document.title = interfaceConfig.APP_NAME;
-
-        if (this.state.generateRoomnames) {
-            this._updateRoomname();
-        }
-
-        if (this._shouldShowAdditionalContent()) {
-            this._additionalContentRef.appendChild(
-                this._additionalContentTemplate.content.cloneNode(true));
-        }
-
-        if (this._shouldShowAdditionalToolbarContent()) {
-            this._additionalToolbarContentRef.appendChild(
-                this._additionalToolbarContentTemplate.content.cloneNode(true)
-            );
-        }
     }
 
-    /**
-     * Removes the classname used for custom styling of the welcome page.
-     *
-     * @inheritdoc
-     * @returns {void}
-     */
-    componentWillUnmount() {
-        super.componentWillUnmount();
 
-        document.body.classList.remove('welcome-page');
+  }
+
+
+
+
+
+  logoutLogic = () => {
+    this.setState({login: 0, meetingbox: 0, name: '' })
+  }
+
+  newMeetingDialog = () => {
+    this.setState({ createPopup: 1 })
+  }
+
+  newMeetingClose = () => {
+ 
+    console.log('hanji')
+    this.setState({ createPopup: 0 })
+    // , this.scheduleApi
+  }
+
+  onSaveAddMeating = () => {
+    console.log('clickedddddddddddd')
+    this.setState({ createPopup: 1 })
+  }
+  
+  handlePwdChange = (event) => {
+    this.setState({ password: event.target.value });
+  }
+
+
+
+   parseForm = (formdata) => {
+
+
+
+    var CryptoJSAesJson = {
+      stringify: function (cipherParams) {
+      var j = {ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64)};
+      if (cipherParams.iv) j.iv = cipherParams.iv.toString();
+      if (cipherParams.salt) j.s = cipherParams.salt.toString();
+        return JSON.stringify(j);
+      },
+      parse: function (jsonStr) {
+      var j = JSON.parse(jsonStr);
+      var cipherParams = CryptoJS.lib.CipherParams.create({ciphertext: CryptoJS.enc.Base64.parse(j.ct)});
+      if (j.iv) cipherParams.iv = CryptoJS.enc.Hex.parse(j.iv)
+      if (j.s) cipherParams.salt = CryptoJS.enc.Hex.parse(j.s)
+        return cipherParams;
+      }
     }
 
-    /**
-     * Implements React's {@link Component#render()}.
-     *
-     * @inheritdoc
-     * @returns {ReactElement|null}
-     */
-    render() {
-        const { _moderatedRoomServiceUrl, t } = this.props;
-        const { APP_NAME, DEFAULT_WELCOME_PAGE_LOGO_URL } = interfaceConfig;
-        const showAdditionalContent = this._shouldShowAdditionalContent();
-        const showAdditionalToolbarContent = this._shouldShowAdditionalToolbarContent();
-        const showResponsiveText = this._shouldShowResponsiveText();
 
-        return (
-            <div
-                className = { `welcome ${showAdditionalContent
-                    ? 'with-content' : 'without-content'}` }
-                id = 'welcome_page'>
-                <div className = 'welcome-watermark'>
-                    <Watermarks defaultJitsiLogoURL = { DEFAULT_WELCOME_PAGE_LOGO_URL } />
-                </div>
-                <div className = 'header'>
-                    <div className = 'welcome-page-settings'>
-                        <SettingsButton
-                            defaultTab = { SETTINGS_TABS.CALENDAR } />
-                        { showAdditionalToolbarContent
-                            ? <div
-                                className = 'settings-toolbar-content'
-                                ref = { this._setAdditionalToolbarContentRef } />
-                            : null
-                        }
-                    </div>
-                    <div className = 'header-image' />
-                    <div className = 'header-text'>
-                        <h1 className = 'header-text-title'>
-                            { t('welcomepage.title') }
-                        </h1>
-{/* -----------------reactreact---------------------------- */}
-                     
-{/* {this.state.meetingbox === 0 ?
-                        <div className="welcome-page-button-schedule"
 
-                       
-                        onClick={this.scheduleMeet} id="schedule_button" tabIndex="4">Schedule</div>
-                        
-                        : 
-                         <LoginMeeting
-                        cancelBtn={this.cancelBtn}
-                        meetingList={this.meetingList}
-                        loginSuccessful={this.loginSuccessful}
-                      ></LoginMeeting>
 
-} */}
+		var secret = {};
+	
+		for(let [name, value] of formdata) {
+			if(secret[`${name}`]) {
+				if (!secret[`${name}`].push) {
+					secret[`${name}`] = [secret[`${name}`]];
+				}
+      var sarwan =	secret[`${name}`].push(`${value}` || '');
+   
+  
+			} else {
+        var sarwan =	secret[`${name}`] = `${value}` || '';
+      
+      }
+    
+    
+		}
+    
+ 
+    var encrypted =  CryptoJS.AES.encrypt(JSON.stringify(secret), this.state.key, {format: CryptoJSAesJson}).toString();
+  
+     encrypted = JSON.parse(encrypted);
+     encrypted = JSON.stringify(encrypted);
+     console.log(encrypted)
 
-<button onClick={this.scheduleMeet}>Schedule</button>
+     return encrypted
 
-<div className="popBoxInner">
+    //  this.setState({fd: encodeURIComponent(encrypted)},() => {this.handleLogin()}
+    //  )
 
-            <div className="popBoxBody">
-              <label>
-                <span>VIDEOMEET Username</span>
-              </label>
-              <input type="text" className="textBox" id="txtUserName" placeholder="username"
-                onChange={this.handleUnameChange}
-              />
 
-              <label>
-                <span>Password</span>
+	}
 
-              </label>
-              <input type="password" className="textBox" id="txtPassword" placeholder="password"
-                onChange={this.handlePwdChange}
-              />
+
+  getFormData = (param) => {
+   
+    var arrParam = param.split("&");
+    var formData = new FormData();
+    for (var i = 0; i < arrParam.length; i++) {
+      formData.append(arrParam[i].split("=")[0].trim(), arrParam[i].split("=")[1].trim());
+    }
+  
+ return "formdata=" +encodeURIComponent(this.parseForm(formData));
+
+ 
+
+ 
+
+  }
+
+
+
+
+  handleEncryption = () => {
+
+    var u = 'kpkpkp'
+    var p = '288181832'
+    var path = "authkey=M2atKiuCGKOo9Mj3&username=" + u + "&password=" + p;
+
+  
+  path = this.getFormData(path)
+  console.log(path)
+
+  if(path !== undefined ){
+    this.handleLogin(path)
+  }
+
+
+
+  }
+
+  changeResponse = (responseTEXT) => {
+
+    var fg = CryptoJS.AES.decrypt(JSON.stringify(responseTEXT),this.state.key,{format: this.state.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8)
+console.log(typeof(fg))
+
+return JSON.parse(fg)
+
+
+//    console.log(CryptoJS.AES.decrypt(JSON.stringify(responseTEXT),this.state.key,{format: this.state.CryptoJSAesJson}).toString(CryptoJS.enc.Utf8) )
+
+
+
+// console.log(typeof(responseTEXT))
+  
+
+  }
+
+
+
+  handleLogin = (path) => {
+
+    
+
+
+    if (this.state.username === '' && this.state.password === '') { alert('enter username and password') }
+
+    else if(this.state.username === '' && this.state.password !== '') {alert('enter username')}
+
+    else if(this.state.username !== '' && this.state.password === '') {alert('enter password')}
+
+    else {
+
+    
+      axios.post('https://api.videomeet.in/v3/authentication.php/', path , {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        "Access-Control-Allow-Origin": "*",
+      }
+
+      )
+        .then((response) => {
+          console.log(response)
+        
+          console.log(response.data)
+        
+        
+           response.data =  this.changeResponse(response.data)
+
+          const loginCredentials = localStorage.getItem('added-credentials')
+         
+          const parsedrest = []
+          parsedrest.push({ username: this.state.username, password: this.state.password })
+
+
+          localStorage.setItem('added-credentials', JSON.stringify(parsedrest));
+          console.log(loginCredentials)
+        
+          if (response.request.readyState === 4 && response.request.status === 200) {
+
+            if (response.data.status === 1) {
+
+           var name = response.data.data.name
+
+           if(loginCredentials !== null)   {
+
+              this.setState({ login: 1 , email: response.data.data.email, mobile: response.data.data.mobile }, () => {this.getName(name)})
+
+           }else{
+             
+           }
+
+
+            }
+
+            else if (response.data.status === 0) {
+
+              alert('Please check Username and Password')
+
+            }
+          }
+        },
+          (error) => {
+            console.log(error)
+          }
+        )
+
+
+    }
+
+
+ 
+
+    }
+
+  
+
+
+  scheduleApi = () => {
+
+
+    this.setState({ createPopup: 0 })
+    axios.post('https://api.videomeet.in/v2/conference.php/confrencelist', qs.stringify({
+
+      authkey: 'M2atKiuCGKOo9Mj3',
+      username: this.state.username
+
+
+    }), {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      "Access-Control-Allow-Origin": "*",
+    }
+
+    )
+      .then((response) => {
+        console.log(response)
+        console.log(response.data.msg)
+
+        if (response.data.msg === "No record found") {
+          this.setState({ dataEntry: 'No record found', parentData: "No record found" })
+        }
+
+        else if (response.data.msg === "conference list fetched successfully") {
+          var res = response.data.data
+          this.setState({ dataSource: res, parentData: response.data.msg })
+
+        }
+
+      },
+        (error) => {
+          console.log(error)
+        }
+      )
+
+  }
+
+
+
+
+  handleUnameChange = (event) => {
+
+    // var a = event.target.value
+    // if(a.match(/^[a-zA-Z ]*$/)){
+
+    //   alert('invalid')}else{
+
+    this.setState({ username: event.target.value });
+      // }
+  }
+
+  loginSuccessful = () => {
+    console.log('ho gay')
+  }
+
+  cancelBtn = () => {
+    this.setState({ cancelButton: 1, meetingbox: 0 })
+    console.log('ll')
+  }
+
+  scheduleMeet = () => {
+    this.setState({ meetingbox: 1 })
+
+  }
+
+  scheduleButton = () => {
+    this.setState({ meetingbox: 0 })
+  }
+
+
+
+  getName = (val) => {
+    this.setState({ name: val })
+    console.log(val)
+  }
+
+  meetingList = () => {
+    console.log('login')
+    return (
+      <ScheduleMeetinglist></ScheduleMeetinglist>
+    )
+  }
+
+
+  componentDidMount() {
+
+ 
+
+  }
+
+  render() {
+
+    return (
+
+      this.state.meetingbox === 0 ?
+
+        <>
+          <div className="welcome-page-settings">
+            <div className="welcome-page-signup-container">
+              <div className="welcome-page-signup-div" id="dvLoggedInUserName"></div>
+              <div className="welcome-page-signup-div" id="dvHostAMeeting">Host a Meeting</div>
+
+
             </div>
+          </div>
+          <div className="header-text">
+            <h1 className=" header-text-title">Bringing People Together</h1>
 
-            <div className="popBoxFooter">
 
-              <button className="cancelButton" onClick={this.props.cancelBtn} >Cancel</button>
-              <button className="loginButton" onClick={this.handleLogin} >Login</button>
+            <div className="welcome without-content">
+
+              <div id="enter_room" style={{ display: this.state.meetingbox === 0 ? '' : 'none' }}>
+                <div className="enter-room-input-container">
+                  <div className="enter-room-title" >Create / Join Meeting</div>
+                  <a className="helper-link">Echo Test</a>
+                  <input className="enter-room-input" id="user_display_name" placeholder="Your Name" type="text" maxlength="50" autoComplet="0ff" tabIndex="1" />
+
+                  <form>
+
+                    <input className="enter-room-input" id="enter_room_field" placeholder="Meeting Room Name" type="text" maxlength="50" autoComplete="off" />
+
+                  </form>
+                </div>
+
+                <button className="welcome-page-button" id="enter_room_button" tabIndex="3">Start</button>
+
+                <div className="welcome-page-button-schedule" onClick={this.scheduleMeet} id="schedule_button" tabIndex="4">Schedule</div>
+
+                <div className="welcome-page-conf-web" >Conference / Webinar </div>
+
+
+              </div>
             </div>
           </div>
 
-                        <p className = 'header-text-description'>
-                            { t('welcomepage.appDescription',
-                                { app: APP_NAME }) }
-                        </p>
-                    </div>
-                    <div id = 'enter_room'>
-                        <div className = 'enter-room-input-container'>
-                            <div className = 'enter-room-title'>
-                                { t('welcomepage.enterRoomTitle') }
-                            </div>
-                            <form onSubmit = { this._onFormSubmit }>
-                                <input
-                                    autoFocus = { true }
-                                    className = 'enter-room-input'
-                                    id = 'enter_room_field'
-                                    onChange = { this._onRoomChange }
-                                    pattern = { ROOM_NAME_VALIDATE_PATTERN_STR }
-                                    placeholder = { this.state.roomPlaceholder }
-                                    ref = { this._setRoomInputRef }
-                                    title = { t('welcomepage.roomNameAllowedChars') }
-                                    type = 'text'
-                                    value = { this.state.room } />
-                                { this._renderInsecureRoomNameWarning() }
-                            </form>
-                        </div>
-                        <div
-                            className = 'welcome-page-button'
-                            id = 'enter_room_button'
-                            onClick = { this._onFormSubmit }>
-                            {
-                                showResponsiveText
-                                    ? t('welcomepage.goSmall')
-                                    : t('welcomepage.go')
-                            }
-                        </div>
-                    </div>
-                    { _moderatedRoomServiceUrl && (
-                        <div id = 'moderated-meetings'>
-                            <p>
-                                {
-                                    translateToHTML(
-                                        t, 'welcomepage.moderatedMessage', { url: _moderatedRoomServiceUrl })
-                                }
-                            </p>
-                        </div>
-                    ) }
-                    { this._renderTabs() }
-                </div>
-                { showAdditionalContent
-                    ? <div
-                        className = 'welcome-page-content'
-                        ref = { this._setAdditionalContentRef } />
-                    : null }
-            </div>
-        );
-    }
+        </> :
 
-    /**
-     * Renders the insecure room name warning.
-     *
-     * @inheritdoc
-     */
-    _doRenderInsecureRoomNameWarning() {
-        return (
-            <div className = 'insecure-room-name-warning'>
-                <Icon src = { IconWarning } />
-                <span>
-                    { this.props.t('security.insecureRoomNameWarning') }
-                </span>
-            </div>
-        );
-    }
+        <LoginMeeting
+          cancelBtn={this.cancelBtn}
+          meetingList={this.meetingList}
+          loginSuccessful={this.loginSuccessful}
+          name={this.state.name}
+          getName={this.getName}
+          username={this.state.username}
+          handleLogin={this.handleLogin}
+          handleUnameChange={this.handleUnameChange}
+          handlePwdChange={this.handlePwdChange}
+          scheduleApi={this.scheduleApi}
+          dataSource={this.state.dataSource}
+          parentData={this.state.parentData}
+          scheduleListDisplay={this.state.scheduleListDisplay}
+          login={this.state.login}
 
-    /**
-     * Prevents submission of the form and delegates join logic.
-     *
-     * @param {Event} event - The HTML Event which details the form submission.
-     * @private
-     * @returns {void}
-     */
-    _onFormSubmit(event) {
-        event.preventDefault();
+          newMeetingDialog={this.newMeetingDialog}
+          newMeetingClose={this.newMeetingClose}
+          createPopup={this.state.createPopup}
+          onSaveAddMeating={this.onSaveAddMeating}
+          scheduleButton={this.scheduleButton}
 
-        if (!this._roomInputRef || this._roomInputRef.reportValidity()) {
-            this._onJoin();
-        }
-    }
+          logoutLogic={this.logoutLogic}
 
-    /**
-     * Overrides the super to account for the differences in the argument types
-     * provided by HTML and React Native text inputs.
-     *
-     * @inheritdoc
-     * @override
-     * @param {Event} event - The (HTML) Event which details the change such as
-     * the EventTarget.
-     * @protected
-     */
-    _onRoomChange(event) {
-        super._onRoomChange(event.target.value);
-    }
+          email={this.state.email}
+          mobile={this.state.mobile}
+          password={this.state.password}
 
-    /**
-     * Callback invoked when the desired tab to display should be changed.
-     *
-     * @param {number} tabIndex - The index of the tab within the array of
-     * displayed tabs.
-     * @private
-     * @returns {void}
-     */
-    _onTabSelected(tabIndex) {
-        this.setState({ selectedTab: tabIndex });
-    }
+          handleEncryption={this.handleEncryption}
 
-    /**
-     * Renders tabs to show previous meetings and upcoming calendar events. The
-     * tabs are purposefully hidden on mobile browsers.
-     *
-     * @returns {ReactElement|null}
-     */
-    _renderTabs() {
-        if (isMobileBrowser()) {
-            return null;
-        }
+        ></LoginMeeting>
 
-        const { _calendarEnabled, _recentListEnabled, t } = this.props;
-
-        const tabs = [];
-
-        if (_calendarEnabled) {
-            tabs.push({
-                label: t('welcomepage.calendar'),
-                content: <CalendarList />
-            });
-        }
-
-        if (_recentListEnabled) {
-            tabs.push({
-                label: t('welcomepage.recentList'),
-                content: <RecentList />
-            });
-        }
-
-        if (tabs.length === 0) {
-            return null;
-        }
-
-        return (
-            <Tabs
-                onSelect = { this._onTabSelected }
-                selected = { this.state.selectedTab }
-                tabs = { tabs } />);
-    }
-
-    /**
-     * Sets the internal reference to the HTMLDivElement used to hold the
-     * welcome page content.
-     *
-     * @param {HTMLDivElement} el - The HTMLElement for the div that is the root
-     * of the welcome page content.
-     * @private
-     * @returns {void}
-     */
-    _setAdditionalContentRef(el) {
-        this._additionalContentRef = el;
-    }
-
-    /**
-     * Sets the internal reference to the HTMLDivElement used to hold the
-     * toolbar additional content.
-     *
-     * @param {HTMLDivElement} el - The HTMLElement for the div that is the root
-     * of the additional toolbar content.
-     * @private
-     * @returns {void}
-     */
-    _setAdditionalToolbarContentRef(el) {
-        this._additionalToolbarContentRef = el;
-    }
-
-    /**
-     * Sets the internal reference to the HTMLInputElement used to hold the
-     * welcome page input room element.
-     *
-     * @param {HTMLInputElement} el - The HTMLElement for the input of the room name on the welcome page.
-     * @private
-     * @returns {void}
-     */
-    _setRoomInputRef(el) {
-        this._roomInputRef = el;
-    }
-
-    /**
-     * Returns whether or not additional content should be displayed below
-     * the welcome page's header for entering a room name.
-     *
-     * @private
-     * @returns {boolean}
-     */
-    _shouldShowAdditionalContent() {
-        return interfaceConfig.DISPLAY_WELCOME_PAGE_CONTENT
-            && this._additionalContentTemplate
-            && this._additionalContentTemplate.content
-            && this._additionalContentTemplate.innerHTML.trim();
-    }
-
-    /**
-     * Returns whether or not additional content should be displayed inside
-     * the header toolbar.
-     *
-     * @private
-     * @returns {boolean}
-     */
-    _shouldShowAdditionalToolbarContent() {
-        return interfaceConfig.DISPLAY_WELCOME_PAGE_TOOLBAR_ADDITIONAL_CONTENT
-            && this._additionalToolbarContentTemplate
-            && this._additionalToolbarContentTemplate.content
-            && this._additionalToolbarContentTemplate.innerHTML.trim();
-    }
-
-    /**
-     * Returns whether or not the screen has a size smaller than a custom margin
-     * and therefore display different text in the go button.
-     *
-     * @private
-     * @returns {boolean}
-     */
-    _shouldShowResponsiveText() {
-        const { innerWidth } = window;
-
-        return innerWidth <= WINDOW_WIDTH_THRESHOLD;
-    }
+    )
+  }
 
 }
 
-export default translate(connect(_mapStateToProps)(WelcomePage));
+export default App;
+
+

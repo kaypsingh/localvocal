@@ -8,9 +8,9 @@ import ChatList from './ChatList';
 import HistoryList from './HistoryList';
 import ShareDetails from './ShareDetails';
 
-// import "flatpickr/dist/themes/material_green.css";
+import "flatpickr/dist/themes/material_green.css";
 
-// import Flatpickr from "react-flatpickr";
+import Flatpickr from "react-flatpickr";
 
 import DeleteRoom from './DeleteRoom';
 import UploadDocument from './UploadDocument';
@@ -91,17 +91,59 @@ class ScheduleMeetinglist extends React.Component {
       uploadLogoPopup: 0,
 
       uploadBackgroundPopup: 0,
-      // date: new Date()
+    
 
       sharePanelPopup: 0,
       sharePanelResponse: [],
       secondResponse: [],
-      pwdCounter: 0
+      pwdCounter: 0,
+
+      userPop: 0,
+      wipe: 0,
+      wipeUser: '',
+
+      uu: '',
+      ue: '',
+      up: '',
+
+      someTime: '',
+      someDate: ''
 
     }
   }
 
+  updateUsername = (event) => {
+    this.setState({uu: event.target.value})
+  }
 
+  updateEmail = (event) => {
+    this.setState({ue: event.target.value})
+  }
+
+  updatePass = (event) => {
+    this.setState({up: event.target.value})
+  }
+
+  wipeUsername = (event) => {
+    console.log(event.target.value)
+    this.setState({ wipeUser:event.target.value })
+  }
+
+  wipePopup = () => {
+    this.setState({wipe: 1})
+  }
+
+  closeWipePopup = () => {
+    this.setState({wipe: 0})
+  }
+
+  clickUserPop = () => {
+    this.setState({ userPop: 1})
+  }
+
+  closeUser = () => {
+    this.setState({ userPop: 0})
+  }
  
 
 pwdStatus = () => {
@@ -159,17 +201,125 @@ pwdStatus = () => {
   }
 
 
+  handleUpdateLogic = () => {
+
+    if(this.state.uu === '' && this.state.ue === '' && this.state.up === ''){
+      alert('Details are updated sucessfully !')
+    }
+
+    else{
+
+      var username = this.props.uname
+      console.log(username)
+      var txtProfileUserName = this.state.uu === '' ? this.props.bc : this.state.uu
+      console.log(txtProfileUserName)
+      var txtUserEmail = this.state.ue === '' ? this.props.email : this.state.ue
+      console.log(txtUserEmail)
+      var txtUserPassword = this.state.up === '' ? this.props.password : this.state.up
+      console.log(txtUserPassword)
+
+      var path = "authkey=M2atKiuCGKOo9Mj3&username="+username+"&name="+txtProfileUserName+"&email="+txtUserEmail+"&password="+txtUserPassword;
+        	path = this.props.getEncFormData(path);
+        	
+      var formData = new FormData(document.getElementById("filecatcher2"));
+
+      formData.append("formdata", path);
+        	formData.append("image", document.getElementById('addfile-input2').files[0]);
+      
+      axios.post('https://api.videomeet.in/v3/profile.php/updateprofile', formData
+
+      , {
+       'Content-Type': 'application/x-www-form-urlencoded',
+       "Access-Control-Allow-Origin": "*",
+   }
+
+   )
+       .then((response) => {
+           console.log(response)
+
+           response.data =  this.props.changeResponse(response.data)
+           alert(response.data.msg)
+
+           this.props.scheduleApi()
+
+          
+
+       },
+           (error) => {
+               console.log(error)
+           }
+       )
+       }
+
+
+   
+
+  }
+
+
+  deleteAccount = () => {
+
+if(this.state.wipeUser === ''){
+
+  alert('Please enter user name')
+}
+
+else if(this.state.wipeUser !== this.props.uname){
+  alert("You are not allowed to wipe account.Please enter your correct user name.");
+}
+
+else{
+
+    var username = this.state.wipeUser
+    var path = "authkey=M2atKiuCGKOo9Mj3&username="+username;
+      path = this.props.getFormData(path);
+      
+      axios.post('https://api.videomeet.in/v3/profile.php/deleteprofile', path
+
+      , {
+         'Content-Type': 'application/x-www-form-urlencoded',
+         "Access-Control-Allow-Origin": "*",
+       }
+   
+       )
+         .then((response) => {
+   
+           console.log(response)
+   
+           response.data =  this.props.changeResponse(response.data)
+   
+           alert(response.data.msg)
+   
+          //  window.location.reload();
+        
+   
+         },
+           (error) => {
+             console.log(error)
+           }
+         )
+   
+          }
+
+
+  }
+
+
   quickPwdLogic = () => {
 
-    console.log(this.state.panelActionRoomname)
-    console.log(this.state.quickPwd)
-    axios.post('https://api.videomeet.in/v2/conference.php/roompassupdate', qs.stringify({
+    // console.log(this.state.panelActionRoomname)
+    // console.log(this.state.quickPwd)
 
-      authkey: 'M2atKiuCGKOo9Mj3',
-      roomname: this.state.panelActionRoomname,
-      room_pass: this.state.quickPwd
+    var roomname = this.state.panelActionRoomname
+    var txtEditRoomPassword = this.state.quickPwd
 
-    }), {
+    var path = "authkey=M2atKiuCGKOo9Mj3&roomname="+roomname+"&room_pass="+txtEditRoomPassword;
+    path = this.props.getFormData(path);
+
+
+    axios.post('https://api.videomeet.in/v3/conference.php/roompassupdate', path
+
+   , {
       'Content-Type': 'application/x-www-form-urlencoded',
       "Access-Control-Allow-Origin": "*",
     }
@@ -178,6 +328,8 @@ pwdStatus = () => {
       .then((response) => {
 
         console.log(response)
+
+        response.data =  this.props.changeResponse(response.data)
 
         alert(response.data.msg)
 
@@ -259,13 +411,15 @@ pwdStatus = () => {
 
 
   fetchDocumentResult = () => {
-    axios.post('https://api.videomeet.in/v2/conference.php/filelist', qs.stringify({
 
-        authkey: 'M2atKiuCGKOo9Mj3',
-        roomname: this.state.panelActionRoomname,
-        ownername: this.state.panelUsername
+    var roomname = this.state.panelActionRoomname
+    var username = this.state.panelUsername
+    var path = "authkey=M2atKiuCGKOo9Mj3&roomname="+roomname+"&ownername="+username;
+        path = this.props.getFormData(path);
+        
+    axios.post('https://api.videomeet.in/v3/conference.php/filelist', path
 
-    }), {
+   , {
         'Content-Type': 'application/x-www-form-urlencoded',
         "Access-Control-Allow-Origin": "*",
     }
@@ -275,7 +429,9 @@ pwdStatus = () => {
 
             console.log(response)
 
-     this.roomActionClose()
+            response.data =  this.props.changeResponse(response.data)
+
+      this.roomActionClose()
 
             // this.setState({documentMessage: response.data.msg})
             this.setState({ documentMessage: response.data.msg, documentData: response.data.data })
@@ -296,13 +452,15 @@ pwdStatus = () => {
 deleteParticipant = (r) => {
 
   console.log(r)
+
+  var participantId = r.participantid
+
+  var path = "authkey=M2atKiuCGKOo9Mj3&participantid="+participantId;
+			path = this.props.getFormData(path);
   
-  axios.post('https://api.videomeet.in/v2/participants.php/delete', qs.stringify({
+  axios.post('https://api.videomeet.in/v3/participants.php/delete', path
 
-    authkey: 'M2atKiuCGKOo9Mj3',
-    participantid: r.participantid
-
-  }), {
+  , {
     'Content-Type': 'application/x-www-form-urlencoded',
     "Access-Control-Allow-Origin": "*",
   }
@@ -311,6 +469,9 @@ deleteParticipant = (r) => {
     .then((response) => {
 
       console.log(response.data.msg)
+
+      response.data =  this.props.changeResponse(response.data)
+
       alert(response.data.msg)
 
       this.listPanelistAction(this.state.sharePanelResponse)
@@ -332,12 +493,16 @@ deleteParticipant = (r) => {
     this.setState({ panelistActionPopup: 1, panelActionRoomname: r.roomname, panelActionPwd: r.room_pass, sharePanelResponse: r })
 
 
-    axios.post('https://api.videomeet.in/v2/participants.php/participantlist', qs.stringify({
+    var conferenceId = r.confrenceid
+      
 
-      authkey: 'M2atKiuCGKOo9Mj3',
-      conferenceid: r.confrenceid
+    var path = "authkey=M2atKiuCGKOo9Mj3&conferenceid="+conferenceId;
 
-    }), {
+    path = this.props.getFormData(path);
+
+    axios.post('https://api.videomeet.in/v3/participants.php/participantlist', path
+
+  , {
       'Content-Type': 'application/x-www-form-urlencoded',
       "Access-Control-Allow-Origin": "*",
     }
@@ -346,6 +511,8 @@ deleteParticipant = (r) => {
       .then((response) => {
 
         console.log(response.data.msg)
+
+        response.data =  this.props.changeResponse(response.data)
 
         if (response.data.msg === "participants list fetched successfully") {
 
@@ -398,16 +565,30 @@ deleteParticipant = (r) => {
 
   handleMeetingDate = (event) => {
 
+    let d = new Date(event);
+    let anyDayNow = d.setDate(d.getDate() + 1);
+    anyDayNow = new Date(anyDayNow).toISOString().slice(0, 10);
+    console.log(anyDayNow)
 
-    // const { date } = this.state;
-    // var newDate = new Date(date.toDateString());
-    // console.log(newDate)
-    // this.setState({ meetingDate: newDate } , () => {console.log(this.state.meetingDate)});
-    this.setState({ meetingDate: event.target.value });
+    
+    var exp = anyDayNow.split("-")[2] + "-" + anyDayNow.split("-")[1] + "-" + anyDayNow.split("-")[0]
+  
+
+    this.setState({ meetingDate: exp });
   }
 
   editMeetingDateFun = (event) => {
-    this.setState({ editMeetingDate: event.target.value })
+
+    let d = new Date(event);
+    let someDayNow = d.setDate(d.getDate() + 1);
+    someDayNow = new Date(someDayNow).toISOString().slice(0, 10);
+    console.log(someDayNow)
+
+    
+    var ex = someDayNow.split("-")[2] + "-" + someDayNow.split("-")[1] + "-" + someDayNow.split("-")[0]
+  
+
+    this.setState({ editMeetingDate: ex })
   }
 
   handleMeetingRoomName = (event) => {
@@ -433,15 +614,17 @@ deleteParticipant = (r) => {
       this.setState({ emptyValue: 0 })
     } else {
       this.setState({ emptyValue: 1 })
+      
     }
 
-    axios.post('https://api.videomeet.in/v2/conferenceschedule.php', qs.stringify({
+    var roomName = event.target.value
 
-      authkey: 'M2atKiuCGKOo9Mj3',
-      roomname: event.target.value,
+    var path = "authkey=M2atKiuCGKOo9Mj3&roomname="+roomName;
+			path = this.props.getFormData(path);
 
+    axios.post('https://api.videomeet.in/v3/conferenceschedule.php', path
 
-    }), {
+   , {
       'Content-Type': 'application/x-www-form-urlencoded',
       "Access-Control-Allow-Origin": "*",
     }
@@ -449,6 +632,9 @@ deleteParticipant = (r) => {
     )
       .then((response) => {
         console.log(response.data.msg)
+
+        response.data =  this.props.changeResponse(response.data)
+
         this.setState({ roomAvail: response.data.msg })
 
 
@@ -475,13 +661,26 @@ deleteParticipant = (r) => {
   }
 
   handleMeetingTime = (event) => {
-    console.log(event.target.value)
-    this.setState({ meetingTime: event.target.value });
+   
+    var d = new Date(event); 
+    var hh = d.getHours(); 
+   var mm =  d.getMinutes(); 
+
+    var j = hh + ':' + mm 
+    console.log(j)
+   
+
+    this.setState({ meetingTime: j });
   }
 
   editMeetingTimeFun = (event) => {
-    console.log(event.target.value)
-    this.setState({ editMeetingTime: event.target.value })
+    var d = new Date(event); 
+    var hh = d.getHours(); 
+   var mm =  d.getMinutes(); 
+
+    var e = hh + ':' + mm 
+   
+    this.setState({ editMeetingTime: e })
   }
 
   handlePwd = () => {
@@ -598,35 +797,42 @@ deleteParticipant = (r) => {
     }
 
 
-    axios.post('https://api.videomeet.in/v2/conference.php/update', qs.stringify({
+    var scheduletime =  this.state.editMeetingDate == "" && this.state.editMeetingTime === "" ? this.state.editResponse.conferencescheduletime :
+    this.state.editMeetingDate !== "" && this.state.editMeetingTime !== "" ? this.state.editMeetingDate.split("-")[2] + "-" + this.state.editMeetingDate.split("-")[1] + "-" + this.state.editMeetingDate.split("-")[0] + " " + this.state.editMeetingTime :
+      this.state.editMeetingDate !== "" && this.state.editMeetingTime === "" ? this.state.editMeetingDate.split("-")[2] + "-" + this.state.editMeetingDate.split("-")[1] + "-" + this.state.editMeetingDate.split("-")[0] + " " + this.state.editTime :
+        this.state.editResponse.conferencescheduletime
 
-      authkey: 'M2atKiuCGKOo9Mj3',
-      conferencescheduletime:
+        var meetingTopic = t
+        var roomname = this.state.editResponse.roomname.toLowerCase()
+       var expirationtime = conferenceexpirationtime
+        var meetingMode = "1"
+        var roomPassword = this.state.editResponse.room_pass
+        var waitingroom = "1"
+        var conId = this.state.editResponse.confrenceid
 
-        this.state.editMeetingDate == "" && this.state.editMeetingTime === "" ? this.state.editResponse.conferencescheduletime :
-          this.state.editMeetingDate !== "" && this.state.editMeetingTime !== "" ? this.state.editMeetingDate.split("-")[2] + "-" + this.state.editMeetingDate.split("-")[1] + "-" + this.state.editMeetingDate.split("-")[0] + " " + this.state.editMeetingTime :
-            this.state.editMeetingDate !== "" && this.state.editMeetingTime === "" ? this.state.editMeetingDate.split("-")[2] + "-" + this.state.editMeetingDate.split("-")[1] + "-" + this.state.editMeetingDate.split("-")[0] + " " + this.state.editTime :
-              this.state.editResponse.conferencescheduletime
+    
+    var path = "authkey=M2atKiuCGKOo9Mj3&conferencescheduletime="+scheduletime+"&topic="+meetingTopic+"&roomname="+roomname+"&conferenceexpirationtime="+expirationtime+"&mode="+meetingMode+"&room_pass="+roomPassword+"&waitingroomenable="+waitingroom+"&confrenceid="+conId
+    path = this.props.getEncFormData(path);
+    
+    var formData = new FormData(document.getElementById("filecatcher"));
+
+    formData.append("formdata", path);
 
 
-      ,
-      topic: t,
-      roomname: this.state.editResponse.roomname.toLowerCase(),
-      conferenceexpirationtime: conferenceexpirationtime,
-      mode: "1",
-      room_pass: this.state.editResponse.room_pass,
-      waitingroomenable: "1",
-      confrenceid: this.state.editResponse.confrenceid
-    }), {
+    axios.post('https://api.videomeet.in/v3/conference.php/update',formData, {
       'Content-Type': 'application/x-www-form-urlencoded',
       "Access-Control-Allow-Origin": "*",
     }
 
     )
       .then((response) => {
-        this.setState({ editPopup: 0 , schedulePopup: 1 }, () => this.props.scheduleApi())
+      
         console.log(response)
+
+        response.data =  this.props.changeResponse(response.data)
         alert(response.data.msg)
+
+        this.setState({ editPopup: 0 , schedulePopup: 1 }, () => this.props.scheduleApi())
 
       },
         (error) => {
@@ -647,25 +853,8 @@ deleteParticipant = (r) => {
 
   createFunctionality = () => {
 
-    //     var aday =  this.state.meetingDate
-    // console.log(aday)
-    //     var today = new Date(aday.toDateString());
-    //     console.log(today)  
-
-    //     const { date } = this.state;
-    //     var newDate = new Date(date.toDateString());
-    //     console.log(newDate)
-
-    // var sortedDate=today.getDate() + "-"+ parseInt(today.getMonth()+1) +"-"+today.getFullYear();
-
-    // console.log(sortedDate)
-
-
-    //it will accept dash values(meetingDate should be in 29-11-1993)
-
-
-
-
+    console.log(this.state.meetingDate)
+   
     if (this.state.meetingTitle === "" || this.state.meetingDate === "" || this.state.meetingRoomName === "" || this.state.meetingTime === "" || this.state.meetingPwd === "Meeting Password") {
       alert('All fields are mandatory')
     }
@@ -689,22 +878,37 @@ deleteParticipant = (r) => {
         var roomEnable = "1"
       }
 
-      axios.post('https://api.videomeet.in/v2/conference.php/add', qs.stringify({
+      var username = this.props.uname
+     
+      var scheduletime =this.state.meetingDate.split("-")[2] + "-" + this.state.meetingDate.split("-")[1] + "-" + this.state.meetingDate.split("-")[0] + " " + this.state.meetingTime
+    
+      var meetingTopic = this.state.meetingTitle
+    
+      var roomname = this.state.meetingRoomName.toLowerCase()
+    
+      var req_origin = "web"
+     
+      var expirationtime = conferenceexpirationtime
+     
+      var meetingMode = "1"
+     
+      var roomPassword = this.state.meetingPwd
+     
+      var waitingroom = roomEnable
+      
 
-        authkey: 'M2atKiuCGKOo9Mj3',
-        username: this.props.uname,
-        conferencescheduletime: this.state.meetingDate.split("-")[2] + "-" + this.state.meetingDate.split("-")[1] + "-" + this.state.meetingDate.split("-")[0] + " " + this.state.meetingTime,
-        topic: this.state.meetingTitle,
-        // roomname: "mummy",
-        roomname: this.state.meetingRoomName.toLowerCase(),
-        req_origin: "web",
-        conferenceexpirationtime: conferenceexpirationtime,
-        mode: "1",
-        room_pass: this.state.meetingPwd,
-        waitingroomenable: roomEnable
+      var path = "authkey=M2atKiuCGKOo9Mj3&username="+username+"&conferencescheduletime="+scheduletime+"&topic="+meetingTopic+"&roomname="+roomname+"&req_origin="+req_origin+"&conferenceexpirationtime="+expirationtime+"&mode="+meetingMode+"&room_pass="+roomPassword+"&waitingroomenable="+waitingroom;
 
+      path = this.props.getEncFormData(path);
 
-      }), {
+      var formData = new FormData(document.getElementById("filecatcher"));
+
+      formData.append("formdata", path);
+        	for (var x = 0; x < document.getElementById('file-input').files.length; x++) {
+        		formData.append("image[]", document.getElementById('file-input').files[x]);
+        	}
+
+      axios.post('https://api.videomeet.in/v3/conference.php/add', formData , {
         'Content-Type': 'application/x-www-form-urlencoded',
         "Access-Control-Allow-Origin": "*",
       }
@@ -712,6 +916,10 @@ deleteParticipant = (r) => {
       )
         .then((response) => {
           console.log(response)
+
+          response.data =  this.props.changeResponse(response.data)
+
+          console.log(response.data.data)
           alert(response.data.msg)
 
           this.setState({ confId: response.data.data.confrenceid }, () => {
@@ -785,6 +993,8 @@ deleteParticipant = (r) => {
 
     const { meetingDate } = this.state;
 
+    
+
     var logoutImg = 'https://bridge01.videomeet.in/images/logout-username.png';
     var updateImg = "https://bridge01.videomeet.in/images/update.png"
 
@@ -808,7 +1018,7 @@ deleteParticipant = (r) => {
               <h5 style={{fontSize: 18, color:'black', textAlign:'left'}} >
                 <span>Schedule Meeting for
                   
-                  <a href="#" style={{font: 'white'}} >{this.props.bc}</a>
+                  <a href="#" onClick={this.clickUserPop} style={{font: 'white'}} >{this.props.bc}</a>
 
                 </span>
               </h5>
@@ -955,7 +1165,7 @@ deleteParticipant = (r) => {
 
             <div className="popBoxFooter">
              
-                <button className="cancelButton" onClick={()=>{this.closeSchedulePopup();this.props.scheduleButton();this.props.panelRedirect()}} >
+                <button className="cancelButton" onClick={()=>{this.closeSchedulePopup();this.props.scheduleButton();this.panelRedirect()}} >
                   <span>close</span>
                 </button>
               <button onClick={()=>{this.props.newMeetingDialog();this.closeSchedulePopup()}}>
@@ -969,6 +1179,155 @@ deleteParticipant = (r) => {
 
         </div>
 
+       
+       <div id="dvUpdateProfile" className="popBox" style={{display: this.state.userPop === 1 ? 'block' : 'none'}}>
+         <div className="popBoxInner">
+           <div className="popBoxHeader" id="dvUpdateProfileTitle">
+             <h5>
+               <span>
+                 <span>Update Profile</span>
+               </span>
+             </h5>
+
+             <span>
+               {/* <img src={}/> */}
+             </span>
+           </div>
+         
+         <div className="popBoxBody" id="dvUpdateProfileBody" style={{overflowY:'auto',maxHeight: 407}}>
+           <form id="filecatcher2">
+             <table className="tableNoBorder" style={{"width":"100%"}}>
+               <tbody>
+                 <tr>
+                   <td>
+                     <input type="text" maxLength="50" className="textBox" onChange={this.updateUsername} placeholder={this.props.bc} id="txtProfileUserName"></input>
+                   </td>
+
+                   <td>
+                     <input type="text" maxLength="50" className="textBox" disabled placeholder={this.props.mobile} readOnly="readonly" id="txtUserMobile"></input>
+                   </td>
+                 </tr>
+
+                 <tr>
+                   <td>
+                     <input type="text" maxLength="50" className="textBox" onChange={this.updateEmail} placeholder={this.props.email} id="txtUserEmail" style={{color:'black'}}></input>
+                   </td>
+
+                  <td>
+                    <span className="relativeDivBlock">
+                      <span className="popPrevIcon" id="spnEyeViewUpdateProfile" ></span>
+                      <input type="password" maxLength="50" className="textBox" onChange={this.updatePass} placeholder={this.props.password} id="txtUserPassword"></input> 
+                    </span>
+                  </td>
+
+</tr>
+
+                  <tr>
+                    <td valign="top">
+                      <div className="cstomFile">
+                        <label for="addfile-input2" className="custom-file-upload fileBtn">
+                          <span>Upload Profile Picture</span>
+                        </label>
+
+                        <input id="addfile-input2" name="files[]" className="file-upload centerDatasheet" type="file" style={{display:"none"}}></input>
+                      </div>
+                    </td>
+
+                    <td colSpan="2">
+                      <div className="file-list-display" id="file-list-display2"></div> 
+
+                    </td>
+
+
+
+                  </tr>
+               
+
+
+
+               </tbody>
+             </table>
+           </form>
+         </div>
+        
+        
+        <div className="popBoxFooter">
+          <button className="cancelButton" onClick={this.closeUser} >
+            <span>Close</span>
+          </button>
+
+          <button id="butSave" onClick={this.handleUpdateLogic} >
+            <span>Update</span>
+          </button>
+
+          <button className="wipeButton" onClick={this.wipePopup} >
+            <span>Wipe Account</span>
+          </button>
+        </div>
+        
+         </div>
+       </div>
+
+       
+
+       <div id="dvWipeAccount" className="popBox" style={{display: this.state.wipe === 1 ? 'block' : 'none'}}>
+         <div className="popBoxInner" >
+           <div className="popBoxHeader">
+             <h5>
+               <span>Wipe Account</span>
+             </h5>
+           </div>
+
+
+           <div className="popBoxBody relativeDiv">
+             <span className="relativeDivBlock">
+               <h6>
+                 <span>Following will be deleted from the VideoMeet System.</span>
+               </h6>
+               1. 
+               <span>Account Details</span>
+               <br></br>
+               2. 
+               <span>Rooms Details</span>
+               <br></br>
+               3.
+               <span>Panelist / Participants</span>
+               <br></br>
+               4.
+               <span>Documents and Logo</span>
+               <br></br>
+               5.
+               <span>Recordings</span>
+               <br></br>
+               6.
+               <span>Chat Messages</span>
+               <br></br>
+               <br></br>
+
+               <p>
+                 <span>Yes, I understand that I will not be able to get them again.</span>
+               </p>
+
+               <input type="text" id="txtwipeuser"  onChange={this.wipeUsername} placeholder="Enter your username" className="textBox"></input>
+
+
+             </span>
+           </div>
+
+<div className="popBoxFooter">
+  <button className="cancelButton" onClick={this.closeWipePopup}>
+    <span>Close</span>
+  </button>
+
+  <button onClick={this.deleteAccount}>
+    <span>Wipe Now - Forget Everything</span>
+  </button>
+</div>
+
+
+         </div>
+       </div>
+       
         {/* create/edit meeting  */}
 
         <div id="dvCreateNewMeeting" className="popBox"
@@ -1050,7 +1409,7 @@ deleteParticipant = (r) => {
                     <tr id="editRommTr" style={{ display: this.state.editPopup === 1 ? '' : 'none' }}>
 
                       <td>
-                        <input type="text" maxLength="50" className="textBox" id="txtMeetingTopicEdit" placeholder={this.state.editResponse.topic}
+                        <input type="text" maxLength="50" className="textBox" id="txtMeetingTopicEdit" placeholder={this.state.editResponse.topic} style={{ color: 'black' }}
                           onChange={this.editMeetingTitleFun}
                         ></input>
                       </td>
@@ -1062,7 +1421,7 @@ deleteParticipant = (r) => {
 
                     <tr id="createRoomTr" style={{ display: this.props.createPopup === 1 ? 'table-row' : 'none' }}>
                       <td>
-                        <input type="text" maxLength="50" className="textBox" placeholder="Title of Meeting" id="txtMeetingTopic" onChange={this.handleMeetingTitle}></input>
+                        <input type="text" maxLength="50" className="textBox" placeholder="Title of Meeting" id="txtMeetingTopic" onChange={this.handleMeetingTitle} style={{ color: 'black' }}></input>
                       </td>
 
                       <td>
@@ -1093,37 +1452,13 @@ deleteParticipant = (r) => {
                     <tr>
                       <td>
 
-                        {/*                         
                         <Flatpickr data-enable-time
-                          options={{
-                            dateFormat: 'd-m-Y',
+                          options={{ dateFormat: 'd-m-Y', clickOpens: true, defaultDate: null, defaultHour: 12, defaultMinute: 0, minDate: null, maxDate: null, enableTime: false, enableSeconds: false, time_24hr: false, noCalendar: false }}
 
-                            clickOpens: true,
-                            defaultDate: null,
-                            defaultHour: 12,
-                            defaultMinute: 0,
-                            minDate: null,
-                            maxDate: null,
-                            enableTime: false,
-                            enableSeconds: false,
-                            time_24hr: false,
-                            noCalendar: false
+                         type="text" className="textBox flatpickr-input" id="txtMeetingDate" style={{ color: 'black' }}
+                          onChange={this.props.createPopup === 1 ? someDate => { this.setState({ someDate }, () => {this.handleMeetingDate(someDate) })} : this.editMeetingDateFun} placeholder={this.state.editPopup === 1 ? this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-") : "DD-MM-YYYY"} id="txtMeetingDate" style={{ color: 'black' }}>
 
-                          }} */}
-
-                        {/* value={meetingDate} */}
-
-                        {/* onChange={meetingDate => {
-                            this.setState({ meetingDate },() => {console.log(this.state.meetingDate)});
-                          }}
-
-                       placeholder={this.state.editPopup === 1 ? this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-") : "DD-MM-YYYY"}
-                    
-                      //  onChange={this.props.createPopup === 1 ? this.handleMeetingDate : this.editMeetingDateFun}
-                        > */}
-
-                        <input type="text" className="textBox flatpickr-input" id="txtMeetingDate" style={{ color: 'black' }}
-                          onChange={this.props.createPopup === 1 ? this.handleMeetingDate : this.editMeetingDateFun} placeholder={this.state.editPopup === 1 ? this.state.editResponse.conferencescheduletime.split(" ")[0].split("-").reverse().join("-") : "DD-MM-YYYY"} id="txtMeetingDate" style={{ color: 'black' }}></input>
+                          </Flatpickr>
 
                       </td>
 
@@ -1131,8 +1466,11 @@ deleteParticipant = (r) => {
 
 
 
-                        <input type="text" className="textBox flatpickr-input" onChange={this.props.createPopup === 1 ? this.handleMeetingTime : this.editMeetingTimeFun} placeholder={this.state.editPopup === 1 ? this.state.editTime : "HH24:MM"} id="txtMeetingDate" style={{ color: 'black' }}
-                        ></input>
+                        <Flatpickr data-enable-time
+                        options={{ dateFormat: 'H:i',clickOpens: true, defaultDate: null, defaultHour: 12, defaultMinute: 0, minDate: null, maxDate: null, enableTime: true, enableSeconds: false, time_24hr: true, noCalendar: true }}
+                    
+                        type="text" className="textBox flatpickr-input" onChange={this.props.createPopup === 1 ? someTime => { this.setState({ someTime }, () => { this.handleMeetingTime(someTime) }) } : this.editMeetingTimeFun} placeholder={this.state.editPopup === 1 ? this.state.editTime : "HH24:MM"} id="txtMeetingDate" style={{ color: 'black' }}
+                        ></Flatpickr>
 
 
 
@@ -1201,6 +1539,10 @@ deleteParticipant = (r) => {
             shareTime={this.state.shareTime}
             sharePopupClose={this.sharePopupClose}
 
+            getFormData={this.props.getFormData}
+            getEncFormData={this.props.getEncFormData}
+            changeResponse={this.props.changeResponse}
+
           ></ShareDetails>
 
         </div>
@@ -1215,13 +1557,16 @@ deleteParticipant = (r) => {
             parentResponse={this.state.parentResponse}
             deletePopupClose={this.deletePopupClose}
             scheduleApi={this.props.scheduleApi}
+            getFormData={this.props.getFormData}
+            getEncFormData={this.props.getEncFormData}
+            changeResponse={this.props.changeResponse}
 
           ></DeleteRoom>
 
         </div>
 
 
-        <div id="dvListParticipant" className="popBox" style={{ display: this.state.panelistActionPopup === 1 ? 'block' : 'none' }}>
+        <div id="dvListParticipant" className="popBox" style={{ display: this.state.panelistActionPopup === 1  && this.state.panelActionDataMsg !== '' ? 'block' : 'none' }}>
           <div className="popBoxInner">
             <div className="popBoxHeader" id="dvListParticipantTitle" >
               <h5 style={{fontSize: 18, color:'black', textAlign:'left'}} >
@@ -1429,21 +1774,37 @@ deleteParticipant = (r) => {
 
         </div>
 
-        <div id="dvAddDocumentLogo" className="popBox" style={{ display: this.state.uploadLogoPopup === 1 ? 'block' : 'none' }} >
-          <UploadLogo
+     {
+        this.state.uploadLogoPopup === 1 ?
+             <UploadLogo
             closeUploadLogo={this.closeUploadLogo}
             panelActionRoomname={this.state.panelActionRoomname}
-          ></UploadLogo>
-        </div>
 
-        <div id="dvBackgroundImage" className="popBox" style={{ display: this.state.uploadBackgroundPopup === 1 ? 'block' : 'none' }}>
+            getFormData={this.props.getFormData}
+            getEncFormData={this.props.getEncFormData}
+            changeResponse={this.props.changeResponse}
+          ></UploadLogo>
+
+          : ''
+
+     }
+       
+
+{ 
+
+this.state.uploadBackgroundPopup === 1 ? 
+       
           <UploadBackground
             closeUploadBackground={this.closeUploadBackground}
             panelActionRoomname={this.state.panelActionRoomname}
+
+            getFormData={this.props.getFormData}
+            getEncFormData={this.props.getEncFormData}
+            changeResponse={this.props.changeResponse}
           ></UploadBackground>
-
-        </div>
-
+: ''
+       
+  }
 
         {
 
@@ -1467,6 +1828,10 @@ deleteParticipant = (r) => {
               documentMessage={this.state.documentMessage}
               documentData={this.state.documentData}
 
+              getFormData={this.props.getFormData}
+            getEncFormData={this.props.getEncFormData}
+            changeResponse={this.props.changeResponse}
+
 
             ></DocumentList>
 
@@ -1483,6 +1848,10 @@ deleteParticipant = (r) => {
               recordingUsername={this.props.username}
               panelRedirect={this.panelRedirect}
               roomActionClose={this.roomActionClose}
+
+              getFormData={this.props.getFormData}
+            getEncFormData={this.props.getEncFormData}
+            changeResponse={this.props.changeResponse}
             ></RecordingList> : ''
         }
 
@@ -1496,6 +1865,10 @@ deleteParticipant = (r) => {
               chatActionRoomname={this.state.panelActionRoomname}
               panelRedirect={this.panelRedirect}
             roomActionClose={this.roomActionClose}
+
+            getFormData={this.props.getFormData}
+            getEncFormData={this.props.getEncFormData}
+            changeResponse={this.props.changeResponse}
            
 
             ></ChatList> : ''
@@ -1511,6 +1884,10 @@ deleteParticipant = (r) => {
               historyActionRoomname={this.state.panelActionRoomname}
               panelRedirect={this.panelRedirect}
               roomActionClose={this.roomActionClose}
+
+              getFormData={this.props.getFormData}  
+            getEncFormData={this.props.getEncFormData}
+            changeResponse={this.props.changeResponse}
 
             ></HistoryList> : ''
         }
@@ -1530,6 +1907,8 @@ deleteParticipant = (r) => {
             clickPanelIcon={this.state.clickPanelIcon}
             newMeetingDialog={this.props.newMeetingDialog}
             openSchedulePopup={this.openSchedulePopup}
+            getFormData={this.props.getFormData}
+            changeResponse={this.props.changeResponse}
 
           ></Panelist> : ''
         }

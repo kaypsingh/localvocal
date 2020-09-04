@@ -20,22 +20,27 @@ class DeleteRoom extends React.Component {
 
     deleteFunctionality = () => {
 
-        axios.post('https://api.videomeet.in/v2/conference.php/delete', qs.stringify({
+        var conferenceId = this.props.parentResponse.confrenceid
 
-            authkey: 'M2atKiuCGKOo9Mj3',
-            confrenceid: this.props.parentResponse.confrenceid
+        var path = "authkey=M2atKiuCGKOo9Mj3&confrenceid="+conferenceId;
+        path = this.props.getFormData(path);
 
+        axios.post('https://api.videomeet.in/v3/conference.php/delete', path
 
-        }), {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            "Access-Control-Allow-Origin": "*",
-        }
+            , {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                "Access-Control-Allow-Origin": "*",
+            }
 
         )
             .then((response) => {
                 console.log(response)
+                response.data =  this.props.changeResponse(response.data)
                 console.log(response.data.msg)
                 alert(response.data.msg)
+
+                
+            
 
                 this.props.scheduleApi()
 

@@ -24,18 +24,18 @@ class SharePanelist extends React.Component {
 
     render() {
 
-var resPan = this.props.sharePanelResponse
- console.log(resPan)
+        var resPan = this.props.sharePanelResponse
+        console.log(resPan)
 
-var secRes = this.props.secondResponse
-console.log(secRes)
+        var secRes = this.props.secondResponse
+        console.log(secRes)
 
         return (
             <>
 
                 <div className="popBoxInner">
                     <div className="popBoxHeader">
-                        <h5 style={{fontSize: 18, color:'black'}}>
+                        <h5 style={{ fontSize: 18, color: 'black' }}>
                             <span>Copy and Share to Invite</span>
                         </h5>
                     </div>
@@ -46,7 +46,7 @@ console.log(secRes)
                         <p>
                             <span>You are invited to join as panelist for the following
                 <strong>
-                                    <span> {" " }Conference</span>
+                                    <span> {" "}Conference</span>
                                 </strong>
                             </span>
                         </p>
@@ -63,14 +63,14 @@ console.log(secRes)
                             <span className="suTitle">
                                 <span>Date:</span>
                             </span>
-                           {" "} {resPan.conferencescheduletime}
+                            {" "} {resPan.conferencescheduletime}
                         </h6>
 
                         <h6>
                             <span className="suTitle">
                                 <span>Host:</span>
                             </span>
-                           {" "} {this.props.bc}
+                            {" "} {this.props.bc}
                         </h6>
 
                         <br></br>
@@ -190,7 +190,7 @@ console.log(secRes)
                         </button>
 
                         <span id="spnSendMailToShare">
-                        {/* onClick={this.handleEmail} */}
+                            {/* onClick={this.handleEmail} */}
                             <button className="btnMail" >
                                 <span>  Send Mail With Password</span>
                             </button>
@@ -210,9 +210,9 @@ console.log(secRes)
                     </div>
 
 
-               
-            </div>
-               
+
+                </div>
+
 
 
             </>
